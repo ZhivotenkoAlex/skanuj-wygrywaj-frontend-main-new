@@ -1,17 +1,32 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <v-app v-scroll="onScroll" style="margin: 0 auto; max-width: 750px" id="app">
+    <RouterView></RouterView>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { defineComponent, onMounted } from "vue"
+import { RouterView } from "vue-router"
 
-export default {
-  name: 'App',
+export default defineComponent({
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    RouterView,
+  },
+  setup() {
+    const onScroll = () => {
+      // Your scroll logic here
+    }
+
+    onMounted(() => {
+      window.addEventListener("scroll", onScroll)
+    })
+
+    return {
+      onScroll,
+    }
+  },
+})
 </script>
 
 <style>
