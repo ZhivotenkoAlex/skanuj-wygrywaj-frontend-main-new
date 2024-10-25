@@ -1,4 +1,4 @@
-import Vue from "vue";
+
 import { COMPANY_CONFIG_KEY, COMPANY_LANGUAGE_KEY, USER_CONFIG_KEY } from "@/appConstants";
 
 export default new (class companyconfig {
@@ -7,14 +7,14 @@ export default new (class companyconfig {
    * @param {string} company_name
    */
   resetCompanyLocals(company_name) {
-    Vue.localStorage.remove(COMPANY_CONFIG_KEY + "_" + company_name);
-    Vue.localStorage.remove(COMPANY_LANGUAGE_KEY + "_" + company_name);
-    Vue.localStorage.remove(USER_CONFIG_KEY + "_" + company_name);
-    Vue.localStorage.remove('system_user_id'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
-    Vue.localStorage.remove('company_id'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
-    Vue.localStorage.remove('vuels__user'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
-    Vue.localStorage.remove('vuels__2tiCompanyId'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
-    Vue.localStorage.remove('vuels__2tiCompanyName'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
+    localStorage.removeItem(COMPANY_CONFIG_KEY + "_" + company_name);
+    localStorage.removeItem(COMPANY_LANGUAGE_KEY + "_" + company_name);
+    localStorage.removeItem(USER_CONFIG_KEY + "_" + company_name);
+    localStorage.removeItem('system_user_id'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
+    localStorage.removeItem('company_id'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
+    localStorage.removeItem('vuels__user'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
+    localStorage.removeItem('vuels__2tiCompanyId'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
+    localStorage.removeItem('vuels__2tiCompanyName'); //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
   }
 
   /**
@@ -56,7 +56,7 @@ export default new (class companyconfig {
    */
   getUserScheme(companyName) {
     let result = "";
-    let json = Vue.localStorage.get(USER_CONFIG_KEY + "_" + companyName);
+    let json = localStorage.getItem(USER_CONFIG_KEY + "_" + companyName);
     if (json) {
       result = JSON.parse(json);
     }
@@ -71,10 +71,10 @@ export default new (class companyconfig {
   setCompanyScheme(obj, company_name) {
     this.resetCompanyLocals(company_name);
     let jsonstr = JSON.stringify(obj.data);
-    Vue.localStorage.set(COMPANY_CONFIG_KEY + "_" + company_name, jsonstr);
-    Vue.localStorage.set('company_name', company_name)
+    localStorage.setItem(COMPANY_CONFIG_KEY + "_" + company_name, jsonstr);
+    localStorage.setItem('company_name', company_name)
     if (obj.data) {
-      Vue.localStorage.set(COMPANY_LANGUAGE_KEY + "_" + company_name, obj.data.default_lang);
+      localStorage.setItem(COMPANY_LANGUAGE_KEY + "_" + company_name, obj.data.default_lang);
     }
   }
 
@@ -84,9 +84,9 @@ export default new (class companyconfig {
    * @param company_name
    */
   setUser(userObj, company_name) {
-    Vue.localStorage.remove(USER_CONFIG_KEY + "_" + company_name);
+    localStorage.removeItem(USER_CONFIG_KEY + "_" + company_name);
     let jsonstr = JSON.stringify(userObj);
-    Vue.localStorage.set(USER_CONFIG_KEY + "_" + company_name, jsonstr);
+    localStorage.setItem(USER_CONFIG_KEY + "_" + company_name, jsonstr);
   }
 
   /**
@@ -222,11 +222,11 @@ export default new (class companyconfig {
     let jsonstr = JSON.stringify(
       { legacy: true }
     );
-    Vue.localStorage.set('LEGACY_MODE' + "_" + company_name, jsonstr);
+    localStorage.setItem('LEGACY_MODE' + "_" + company_name, jsonstr);
   }
 
   isLegacyMode(company_name) {
-    let json = Vue.localStorage.get('LEGACY_MODE' + "_" + company_name);
+    let json = localStorage.getItem('LEGACY_MODE' + "_" + company_name);
     if (json) {
       let legacyObj = JSON.parse(json);
       if (legacyObj.legacy) {
@@ -241,11 +241,11 @@ export default new (class companyconfig {
     let jsonstr = JSON.stringify(
       { param: value }
     );
-    Vue.localStorage.set(key + "_" + company_name, jsonstr);
+    localStorage.setItem(key + "_" + company_name, jsonstr);
   }
 
   getUrlParamFromLocalStorage(company_name, key) {
-    let json = Vue.localStorage.get(key + "_" + company_name);
+    let json = localStorage.getItem(key + "_" + company_name);
     if (json) {
       let legacyObj = JSON.parse(json);
       if (legacyObj.param) {
@@ -256,7 +256,7 @@ export default new (class companyconfig {
   }
 
   removeUrlParamFromLocalStorage(company_name, key) {
-    Vue.localStorage.remove(key + "_" + company_name);
+    localStorage.removeItem(key + "_" + company_name);
   }
 
   goToFbBotLogin(company, url) {
