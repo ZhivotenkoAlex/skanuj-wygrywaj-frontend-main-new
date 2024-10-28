@@ -122,7 +122,7 @@ export default {
   },
   /**
    * Do google login
-   * @param  accesstoken - Google Acess token
+   * @param  accesstoken - Google Access token
    * @param companyname - company name from querystring
    * @param invitecode - invite code from other user *
    * @param legacy

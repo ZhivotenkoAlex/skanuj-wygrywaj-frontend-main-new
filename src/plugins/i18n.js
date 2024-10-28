@@ -43,8 +43,8 @@ export function loadLanguageAsync(lang, url_name) {
       i18n.global.setLocaleMessage(lang, msgs);
       setI18nLanguage(lang);
     })
-  // .catch(function (error) {
-  //   console.info("Refresh i18n error: ", error);
-  //   return Promise.reject(error);
-  // });
+    .catch(function (error) {
+      console.info("Refresh i18n error: ", error);
+      return Promise.reject(error);
+    });
 }

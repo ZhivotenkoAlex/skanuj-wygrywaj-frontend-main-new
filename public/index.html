@@ -1,17 +1,122 @@
 <!DOCTYPE html>
-<html lang="">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+        <title>Platforma lojalnościowa</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link ref="preconnect" href="https://cdn.jsdelivr.net">
+        <link rel="preconnect" href="https://apis.google.com">
+        <link rel="preconnect" href="https://system.blovly.com">
+        <link ref="preconnect" href="https://appleid.cdn-apple.com">
+
+        <link rel="stylesheet" href="./loading.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+
+        <script src="https://apis.google.com/js/api:client.js"></script>
+        <script src="https://system.blovly.com/assets/js/jquery.1.9.1.min.js"></script>
+        <script src="https://system.blovly.com/assets/js/vendor/jquery.ui.widget.js"></script>
+        <script src="https://system.blovly.com/assets/js/exif-js.js"></script>
+        <script src="https://system.blovly.com/assets/js/jquery.iframe-transport.js"></script>
+        <script src="https://system.blovly.com/assets/js/load-image.all.min.js"></script>
+        <script src="https://system.blovly.com/assets/js/canvas-to-blob.min.js"></script>
+        <script src="https://system.blovly.com/assets/js/jquery.fileupload.js"></script>
+        <script src="https://system.blovly.com/assets/js/jquery.fileupload-process.js"></script>
+        <script src="https://system.blovly.com/assets/js/jquery.fileupload-image.js"></script>
+        <script src="https://system.blovly.com/rest/js/adapter-latest.js"></script>
+        <script>
+            !function(f,b,e,v,n,t,s) {
+                if(f.fbq)return;
+                n=f.fbq=function() {
+                    n.callMethod? n.callMethod.apply(n,arguments): n.queue.push(arguments)
+                };
+                if(!f._fbq) f._fbq=n;
+                n.push=n;
+                n.loaded=!0;
+                n.version='2.0';
+                n.queue=[];
+                t=b.createElement(e);
+                t.async=!0;
+                t.src=v;
+                s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)
+            }(window, document,'script', 'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '1168953883119698');
+            fbq('track', 'PageView');
+        </script>
+
+        <noscript>
+            <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1168953883119698&ev=PageView&noscript=1"/>
+        </noscript>
+
+        <noscript>
+            <iframe src="//www.googletagmanager.com/ns.html?id=GTM-PCZWGL9" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>
+
+        <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start': new Date().getTime(), event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src = '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-PCZWGL9');
+        </script>
+
+        <!-- Global site tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-298953983"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments)}
+            gtag('js', new Date());
+            gtag('config', 'AW-298953983');
+        </script>
+        <!-- End of Global site tag -->
+
+        <script>
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var c = url.searchParams.get("company_name");
+
+            var head  = document.getElementsByTagName('head')[0];
+            var link  = document.createElement('link');
+            link.rel  = 'stylesheet';
+            link.type = 'text/css';
+            link.href = '/api/web/company/getstyles?url_name=' + c;
+            link.media = 'all';
+            head.appendChild(link);
+        </script>
+
+        <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+    </head>
+
+    <body>
+        <noscript>
+            <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+            Please enable it to continue.</strong>
+        </noscript>
+
+        <div id="app">
+            <!-- <div class="loader">Loading...</div> -->
+            <vue-inspector :hide-lines="true"></vue-inspector>
+        </div>
+
+        <script src="https://chat.system.blovly.com/supportboard/js/main.js" crossorigin="anonymous"></script>
+        <script src="https://chat.system.blovly.com/supportboard/js/init.js" crossorigin="anonymous"></script>
+        <script src="https://webrtchacks.github.io/adapter/adapter-latest.js"></script>
+        <!-- built files will be auto injected -->
+    </body>
 </html>

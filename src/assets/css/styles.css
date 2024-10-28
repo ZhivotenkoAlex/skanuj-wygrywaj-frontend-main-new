@@ -13,11 +13,11 @@ aside.v-navigation-drawer {
   z-index: 99999;
 }
 
-input {
-  /*letter-spacing: 2px;*/
-  /*font-size: 20px;*/
-  /*font-weight: 700;*/
-}
+/* input { */
+/*letter-spacing: 2px;*/
+/*font-size: 20px;*/
+/*font-weight: 700;*/
+/* } */
 
 .sb-main .sb-chat-btn {
   background: #1a1a1c !important;

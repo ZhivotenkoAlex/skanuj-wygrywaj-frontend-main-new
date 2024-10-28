@@ -248,7 +248,7 @@
                     <div class="social-icons">
                       <a
                         class="social-icon social-icon--email"
-                        @click="doemaillogin"
+                        @click="doEmailLogin"
                         :class="options.agree ? '' : 'no-pointer-events'"
                       >
                         <v-icon large color="white">mdi-email</v-icon>
@@ -282,7 +282,7 @@
                     <fblogin
                       :class="options.agree ? '' : 'no-pointer-events'"
                       v-if="options.showSocial"
-                      @showerror="showloginerror"
+                      @showerror="showLoginError"
                       @click="setInviteCode"
                     ></fblogin>
                   </a>
@@ -297,7 +297,7 @@
                     <googlelogin
                       :class="options.agree ? '' : 'no-pointer-events'"
                       v-if="options.showSocial"
-                      @showerror="showloginerror"
+                      @showerror="showLoginError"
                       @click="setInviteCode"
                     ></googlelogin>
                   </a>
@@ -307,7 +307,7 @@
                     <div class="social-icons">
                       <a
                         class="social-icon social-icon--phone"
-                        @click="dosmslogin"
+                        @click="doSmsLogin"
                         :class="options.agree ? '' : 'no-pointer-events'"
                       >
                         <v-icon large color="white">mdi-phone</v-icon>
@@ -329,7 +329,7 @@
                   v-model="options.agree"
                   :rules="[
                     (value) => {
-                      return agreerule(value)
+                      return agreeRule(value)
                     },
                   ]"
                   class="regulamin-checkbox"
@@ -358,7 +358,7 @@
                   v-model="register.valid"
                   class="face-login-form mb-12 py-12 px-4"
                   style="display: none"
-                  ref="registerform"
+                  ref="registerorm"
                 >
                   <v-alert
                     v-if="options.showerr && showFaceLoginPhoneForm"
@@ -370,10 +370,10 @@
                   <p class="mx-auto black--text">Wpisz numer telefonu</p>
                   <v-text-field
                     solo
-                    class="facephone"
+                    class="facePhone"
                     :disabled="register.confirmationcodesent"
                     placeholder="+48"
-                    name="registeruserphone"
+                    name="registerUserPhone"
                     style="width: 100%"
                     type="text"
                     v-model="register.phone"
@@ -390,7 +390,7 @@
                     solo
                     v-if="register.confirmationcodesent"
                     :label="$t('LoginScreen.SMS_CODE')"
-                    name="registerconfirmationcode"
+                    name="registerConfirmationCode"
                     style="width: 100%"
                     type="text"
                     autocomplete="off"
@@ -415,15 +415,15 @@
 
                 <input
                   type="tel"
-                  id="facephone"
-                  class="facephone face-login-hidden"
+                  id="facePhone"
+                  class="facePhone face-login-hidden"
                   style="display: none; background-color: white"
                   placeholder="+48"
                 />
 
                 <button
-                  id="facesubmit"
-                  class="facesubmit mt-3 face-login-hidden"
+                  id="faceSubmit"
+                  class="faceSubmit mt-3 face-login-hidden"
                   style="display: none"
                 >
                   {{ $t("LoginScreen.SEND") }}
@@ -493,6 +493,7 @@ import {
   SMS_CHECK_CONFIRMED,
 } from "@/appConstants"
 import fapi from "@/services/fetchapi"
+import { i18n } from "@/plugins/i18n"
 
 const config = reactive({})
 const options = reactive({
@@ -542,8 +543,6 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
-  // let VueApp = this
-
   const styleTag = document.createElement("style")
   styleTag.appendChild(document.createTextNode(config.custom_css))
   document.head.appendChild(styleTag)
@@ -619,7 +618,7 @@ function agreeRules() {
   options.agree = true
 }
 
-function doemaillogin() {
+function doEmailLogin() {
   let passedCompanyId = companyconfig.getCompanyIdfromUrl()
   router.push({
     name: "signup",
@@ -655,7 +654,7 @@ function doAppleLogin() {
   parent.postMessage("close", "*")
 }
 
-function dosmslogin() {
+function doSmsLogin() {
   let passedCompanyId = companyconfig.getCompanyIdfromUrl()
   router.push({
     name: "signupsms",
@@ -710,7 +709,7 @@ function faceLoginFinishCallback(
 ) {
   if (!is_success) {
     console.error("faceLoginFinishCallback failure")
-    showloginerror("Errors.INVALID_PHONE")
+    showLoginError("Errors.INVALID_PHONE")
     console.error(failure_reason)
     return
   }
@@ -721,13 +720,13 @@ function faceLoginFinishCallback(
 }
 
 function sendFacePhoneConfirm() {
-  var elements = document.getElementsByClassName("facephone")
+  var elements = document.getElementsByClassName("facePhone")
 
   for (var i = 0; i < elements.length; i++) {
     elements[i].value = register.phone
   }
 
-  document.getElementById("facesubmit").click()
+  document.getElementById("faceSubmit").click()
 }
 
 function doPhoneCheck() {
@@ -847,7 +846,7 @@ function onFaceLoginSuccess(atoken) {
           accesstkn.expiry_second
         )
 
-        let lang = this.$i18n.locale
+        let lang = i18n.global.locale
 
         fapi
           .hasMandatoryRules(accesstkn.access_token, passedCompanyId, lang)
@@ -899,7 +898,7 @@ function onFaceLoginSuccess(atoken) {
       ) {
         this.$emit("showerror", "Errors.NO_COMPANY_FOUND")
       } else {
-        showloginerror("Errors." + errormsg)
+        showLoginError("Errors." + errormsg)
       }
     })
 }
@@ -929,14 +928,14 @@ function setupLayout() {
   }
 }
 
-function agreerule(value) {
+function agreeRule(value) {
   if (!value) {
     return ""
   }
   return true
 }
 
-function showloginerror(error) {
+function showLoginError(error) {
   options.showerr = false
   options.errors = error
   options.showerr = true
@@ -1122,20 +1121,20 @@ function checkSafariBrowser() {
   font-size: 7.5pt;
 }
 
-.tooltip:after {
-  /*display: block;*/
-  /*position: absolute;*/
-  /*bottom: 1px;*/
-  /*left: 50%;*/
-  /*width: 0;*/
-  /*height: 0;*/
-  /*content: "";*/
-  /*border: solid;*/
-  /*border-width: 10px 10px 0 10px;*/
-  /*border-color: transparent;*/
-  /*-webkit-transform: translate(-50%, 100%);*/
-  /*transform: translate(-50%, 100%);*/
-}
+/* .tooltip:after { */
+/*display: block;*/
+/*position: absolute;*/
+/*bottom: 1px;*/
+/*left: 50%;*/
+/*width: 0;*/
+/*height: 0;*/
+/*content: "";*/
+/*border: solid;*/
+/*border-width: 10px 10px 0 10px;*/
+/*border-color: transparent;*/
+/*-webkit-transform: translate(-50%, 100%);*/
+/*transform: translate(-50%, 100%);*/
+/* } */
 
 .no-pointer-events {
   pointer-events: none;
