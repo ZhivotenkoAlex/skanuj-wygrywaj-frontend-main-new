@@ -38,7 +38,6 @@ export function loadLanguageAsync(lang, url_name) {
       }
     })
     .then(response => {
-      console.log("🚀 ~ loadLanguageAsync ~ response:", response)
       let msgs = response.data;
       loadedLanguages.push(lang);
       i18n.global.setLocaleMessage(lang, msgs);

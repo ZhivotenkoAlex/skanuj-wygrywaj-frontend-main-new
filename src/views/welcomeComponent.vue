@@ -25,7 +25,6 @@ export default {
     const route = useRoute()
     const router = useRouter()
     const isErrorCompany = ref(false)
-    console.log("🚀 ~ setup ~ isErrorCompany:", isErrorCompany)
 
     const processUrlParams = () => {
       const passedCompanyName = companyconfig.getCompanyIdfromUrl()
@@ -101,8 +100,6 @@ export default {
 
     const doRedirect = () => {
       let islogged = auth.isLoggedIn()
-      console.log("🚀 ~ doRedirect ~ islogged:", islogged)
-      console.log("🚀 ~ doRedirect ~ route:", route)
       let currentroute = route.name
       let inviteCode = route.query.inviteCode
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()

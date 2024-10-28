@@ -71,7 +71,7 @@
             {{ $t("LoginScreen.BACK_BTN") }}
           </v-btn>
           <v-card tile :style="`background:${config.mcolor} !important`">
-            <v-row v-if="!showFaceLoginPhoneForm">
+            <v-row v-if="!showFaceLoginPhoneForm" style="margin: 12px">
               <v-row justify="center">
                 <v-col
                   cols="10"
@@ -231,11 +231,7 @@
                     </a>
                   </div>
                 </v-col>
-                <v-col
-                  cols="10"
-                  class="mb-0 pb-0"
-                  style="color: white !important"
-                >
+                <v-col cols="10" style="color: white !important">
                   <p data-test="subtitle" class="mx-auto">
                     {{ $t("LoginScreen.ANOTHER_LOGIN_USING") }}
                   </p>
@@ -1103,7 +1099,7 @@ function checkSafariBrowser() {
 
 .social-icon i {
   position: relative;
-  top: -12px;
+  /* top: -12px; */
   margin: 0 !important;
 }
 
