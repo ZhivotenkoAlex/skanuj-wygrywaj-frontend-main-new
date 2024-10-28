@@ -1,30 +1,31 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-container>
     <p
-      v-show="!isErrorCompany"
+      v-show="isErrorCompany"
       v-text="$t('Errors.FAILED_TO_LOAD_COMPANY_ISSUE')"
     ></p>
-    <p v-show="!isError" v-text="$t('Errors.FAILED_TO_LOAD')"></p>
+    <p v-show="isError" v-text="$t('Errors.FAILED_TO_LOAD')"></p>
   </v-container>
 </template>
 
 <script>
 import { ref, onMounted } from "vue"
 import api from "@/services/companyapi"
-// import fapi from "@/services/fetchapi"
+import fapi from "@/services/fetchapi"
 import auth from "@/core/auth.js"
 import companyconfig from "@/core/companyconfig"
 import config from "@/variable"
 import { loadLanguageAsync } from "@/plugins/i18n"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 
 export default {
   setup() {
     const isLoaded = ref(false)
     const isError = ref(false)
     const route = useRoute()
+    const router = useRouter()
     const isErrorCompany = ref(false)
+    console.log("🚀 ~ setup ~ isErrorCompany:", isErrorCompany)
 
     const processUrlParams = () => {
       const passedCompanyName = companyconfig.getCompanyIdfromUrl()
@@ -101,48 +102,49 @@ export default {
     const doRedirect = () => {
       let islogged = auth.isLoggedIn()
       console.log("🚀 ~ doRedirect ~ islogged:", islogged)
-      // let currentroute = route.name
-      // let inviteCode = route.query.inviteCode
-      // let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      // if (!islogged) {
-      //   if (inviteCode) {
-      //     router.push({
-      //       name: "signup",
-      //       query: { company_name: passedCompanyId, inviteCode: inviteCode },
-      //     })
-      //   } else if (currentroute != "login") {
-      //     router.push({
-      //       name: "login",
-      //       query: { company_name: passedCompanyId },
-      //     })
-      //   }
-      // } else {
-      //   if (
-      //     currentroute === "welcome" ||
-      //     currentroute === "login" ||
-      //     currentroute === "signup" ||
-      //     currentroute === "forgotpassword"
-      //   ) {
-      //     let token = auth.getAccessToken()
-      //     let lang = this.$i18n.locale
-      //     if (fapi.hasAnyRules(token, passedCompanyId, lang)) {
-      //       router.push({
-      //         name: "rules",
-      //         query: { company_name: passedCompanyId },
-      //       })
-      //     } else {
-      //       router.push({
-      //         name: "home",
-      //         query: { company_name: passedCompanyId },
-      //       })
-      //     }
-      //   } else {
-      //     router.push({
-      //       name: currentroute,
-      //       query: { company_name: passedCompanyId },
-      //     })
-      //   }
-      // }
+      console.log("🚀 ~ doRedirect ~ route:", route)
+      let currentroute = route.name
+      let inviteCode = route.query.inviteCode
+      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+      if (!islogged) {
+        if (inviteCode) {
+          router.push({
+            name: "signup",
+            query: { company_name: passedCompanyId, inviteCode: inviteCode },
+          })
+        } else if (currentroute != "login") {
+          router.push({
+            name: "login",
+            query: { company_name: passedCompanyId },
+          })
+        }
+      } else {
+        if (
+          currentroute === "welcome" ||
+          currentroute === "login" ||
+          currentroute === "signup" ||
+          currentroute === "forgotpassword"
+        ) {
+          let token = auth.getAccessToken()
+          let lang = this.$i18n.locale
+          if (fapi.hasAnyRules(token, passedCompanyId, lang)) {
+            router.push({
+              name: "rules",
+              query: { company_name: passedCompanyId },
+            })
+          } else {
+            router.push({
+              name: "home",
+              query: { company_name: passedCompanyId },
+            })
+          }
+        } else {
+          router.push({
+            name: currentroute,
+            query: { company_name: passedCompanyId },
+          })
+        }
+      }
     }
 
     const checkAuthenticatedWithConfigLoaded = () => {

@@ -1,0 +1,93 @@
+#close-widget-btn {
+  position: fixed;
+  right: 14px;
+  top: 10px;
+  z-index: 999;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+aside.v-navigation-drawer {
+  z-index: 99999;
+}
+
+input {
+  /*letter-spacing: 2px;*/
+  /*font-size: 20px;*/
+  /*font-weight: 700;*/
+}
+
+.sb-main .sb-chat-btn {
+  background: #1a1a1c !important;
+  border: 3px solid rgb(255, 255, 255) !important;
+  color: rgb(255, 255, 255) !important;
+  height: 66px !important;
+  width: 66px !important;
+  margin-bottom: 5px !important;
+}
+
+.sb-main .sb-chat-btn:hover {
+  background: #ffffff29 !important;
+}
+
+.theme--light.v-btn {
+  color: white;
+}
+
+/*.sb-chat-btn, .sb-chat>div>.sb-header, .sb-chat .sb-dashboard>div>.sb-btn:hover, .sb-chat .sb-scroll-area .sb-header, .sb-input.sb-input-btn>div, div ul.sb-menu li:hover, .sb-select ul li:hover, .sb-popup.sb-emoji .sb-emoji-bar>div.sb-active, .sb-popup.sb-emoji .sb-emoji-bar>div:hover, .sb-btn {
+    background-color: rgb(89 167 65)!important;
+}
+
+.sb-chat .sb-dashboard>div>.sb-btn, .sb-editor .sb-bar-icons>div:hover:before, .sb-articles>div:hover>div, .sb-chat .sb-btn-text:hover, .sb-list .sb-btn-text:hover, .sb-editor .sb-submit, .sb-select p:hover, div ul.sb-menu li.sb-active, .sb-select ul li.sb-active, .sb-search-btn>i:hover, .sb-search-btn.sb-active i, .sb-rich-message .sb-input>span.sb-active:not(.sb-filled), .sb-input.sb-input-image .image:hover:before, .sb-rich-message .sb-card .sb-card-btn, .sb-rich-message.sb-rich-slider .sb-arrow:hover {
+    color: rgb(89 167 65)!important;
+}*/
+
+.v-messages__message {
+  /*font-size: 18px!important;*/
+  /*line-height: 17px;*/
+  /*letter-spacing: 1px!important;*/
+  color: red;
+  text-transform: capitalize;
+}
+
+body
+  .theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(
+    .v-btn--outlined
+  ) {
+  /* background-color: #064a00 !important; */
+  background-color: transparent !important;
+  color: white !important;
+}
+
+body::-webkit-scrollbar {
+  width: 3px; /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px; /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #606060; /* color of the scroll thumb */
+  border-radius: 20px; /* roundness of the scroll thumb */
+}
+
+.theme--light.v-btn.v-btn--disabled .v-icon {
+  color: white !important;
+}
+
+a.regulamin-link:hover {
+  color: #606060 !important;
+}
+
+.monster-billet-row {
+  z-index: 1 !important;
+}
+
+/*.v-input--selection-controls__input .v-application .primary--text {*/
+/*    color: #FFF !important;*/
+/*    caret-color: #FFF !important;*/
+/*}*/

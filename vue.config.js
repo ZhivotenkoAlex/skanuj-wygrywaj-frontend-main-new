@@ -53,12 +53,12 @@ module.exports = defineConfig({
       // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
       autoImport: true,
     },
-    // i18n: {
-    //   locale: 'en',
-    //   fallbackLocale: 'en',
-    //   localeDir: undefined,
-    //   enableInSFC: undefined
-    // }
+    i18n: {
+      locale: 'en',
+      fallbackLocale: 'en',
+      localeDir: undefined,
+      enableInSFC: undefined
+    }
   },
   pwa: {
     name: 'My App',
