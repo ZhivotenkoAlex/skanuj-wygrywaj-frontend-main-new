@@ -99,7 +99,7 @@
                     v-if="options.showerr && !options.agree"
                     type="error"
                     transition="slide-y-reverse-transition"
-                    >{{ options.errors }}
+                    >{{ $t(options.errors) }}
                   </v-alert>
                 </v-col>
                 <v-col cols="10 pb-10 pt-7" sm10 md10>
@@ -364,7 +364,7 @@
                     v-if="options.showerr && showFaceLoginPhoneForm"
                     type="error"
                     transition="slide-y-reverse-transition"
-                    >{{ options.errors }}
+                    >{{ $t(options.errors) }}
                   </v-alert>
 
                   <p class="mx-auto black--text">Wpisz numer telefonu</p>
