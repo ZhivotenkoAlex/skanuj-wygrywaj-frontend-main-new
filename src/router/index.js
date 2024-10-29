@@ -206,7 +206,9 @@ router.beforeEach(async (to, from, next) => {
                 });
             } else {
                 const hasMandatoryRules = await hasRules();
-                if (hasMandatoryRules === true && router.currentRoute.path !== '/signup') {
+                const isNotSignUp = router.currentRoute.value.path !== '/signup'
+
+                if (hasMandatoryRules === true && isNotSignUp) {
                     return
                 } else {
                     return next();
@@ -217,6 +219,7 @@ router.beforeEach(async (to, from, next) => {
             to.name != "welcome"
         ) {
             let passedCompanyId = companyconfig.getCompanyIdfromUrl();
+
             if (to.name === 'blm' && !appauth.isLoggedIn()) {
                 window.location = "https://demo.2take.it/uvp/?cn=" + passedCompanyId;
             } else {
