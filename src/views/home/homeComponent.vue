@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { ref, onMounted, defineComponent, computed } from "vue"
 import companyconfig from "@/core/companyconfig"
 //import incentives from "@/components/home/incentivesComponent";
 //import products from "@/components/home/productsComponent";
@@ -39,38 +40,8 @@ import tasks from "@/components/home/tasksComponent"
 //import cashback from "../../components/home/cashback";
 //import loginapi from "@/services/loginapi";
 //import auth from "@/core/auth";
-export default {
-  data() {
-    return {
-      tab: "tab1",
-      config: {},
-      fullyLoaded: false,
-    }
-  },
-  created() {
-    this.setupLayout()
-  },
-  mounted() {
-    this.styleTag = document.createElement("style")
-    this.styleTag.appendChild(document.createTextNode(this.config.custom_css))
-    document.head.appendChild(this.styleTag)
 
-    if (typeof window.gtag !== "undefined") {
-      window.gtag("event", "NEW_LOYALTY", {
-        event_category: "page_open",
-        value: "home",
-      })
-    }
-  },
-  computed: {
-    dynamicComponent() {
-      if (this.config.index_component == null) {
-        return {}
-      }
-      return () =>
-        import(`@/components/home/${this.config.index_component}.vue`)
-    },
-  },
+export default defineComponent({
   components: {
     //incentives,
     //products,
@@ -79,33 +50,67 @@ export default {
     //contents,
     //cashback,
   },
-  methods: {
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+  setup() {
+    const tab = ref("tab1")
+    const config = ref({})
+    const fullyLoaded = ref(false)
+    let styleTag
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
-        this.$set(this.config, "showContent", data.showContent)
-        this.$set(this.config, "showScoreCard", data.showScoreCard)
-        this.$set(this.config, "pointIndex", data.scorecardOrder)
-        this.$set(this.config, "rewardIndex", data.rewardOrder)
-        this.$set(this.config, "contentIndex", data.contentOrder)
-        this.$set(this.config, "taskIndex", data.taskOrder)
-        this.$set(this.config, "has_cashback", data.has_cashback)
-        this.$set(this.config, "hasIncentives", data.has_incentives)
-        this.$set(this.config, "index_component", data.index_component)
-        this.$set(this.config, "custom_css", data.layout_custom_css)
-        this.$set(this.config, "outercolor", data.layout_background_color_outer)
-        this.$set(this.config, "innercolor", data.layout_background_color_inner)
+        config.value = {
+          mcolor: data.main_color,
+          mfontcolor: data.main_font_color,
+          showContent: data.showContent,
+          showScoreCard: data.showScoreCard,
+          pointIndex: data.scorecardOrder,
+          rewardIndex: data.rewardOrder,
+          contentIndex: data.contentOrder,
+          taskIndex: data.taskOrder,
+          has_cashback: data.has_cashback,
+          hasIncentives: data.has_incentives,
+          index_component: data.index_component,
+          custom_css: data.layout_custom_css,
+          outercolor: data.layout_background_color_outer,
+          innercolor: data.layout_background_color_inner,
+        }
       }
-      this.fullyLoaded = true
-    },
+      fullyLoaded.value = true
+    }
+
+    onMounted(() => {
+      setupLayout()
+      styleTag = document.createElement("style")
+      styleTag.appendChild(document.createTextNode(config.value.custom_css))
+      document.head.appendChild(styleTag)
+
+      if (typeof window.gtag !== "undefined") {
+        window.gtag("event", "NEW_LOYALTY", {
+          event_category: "page_open",
+          value: "home",
+        })
+      }
+    })
+
+    const dynamicComponent = computed(() => {
+      if (config.value.index_component == null) {
+        return {}
+      }
+      return () =>
+        import(`@/components/home/${config.value.index_component}.vue`)
+    })
+
+    return {
+      tab,
+      config,
+      fullyLoaded,
+      dynamicComponent,
+    }
   },
-}
+})
 </script>
+
 <style>
 .order1 {
   order: 1;

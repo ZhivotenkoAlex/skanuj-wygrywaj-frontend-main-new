@@ -95,103 +95,94 @@
     </v-flex>
   </v-card>
 </template>
+
 <script>
+import { ref, reactive, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { NO_COMPANY_FOUND } from "@/appConstants"
 import companyconfig from "@/core/companyconfig"
 import alert from "@/components/shared/errorAlert.vue"
 import auth from "@/core/auth"
 import api from "@/services/fetchapi"
-// import Vue from "vue"
 import VueFormGenerator from "vue-form-generator"
-// import "vue-form-generator/dist/vfg-core.css"
 
-// Vue.use(VueFormGenerator)
 export default {
-  data() {
-    return {
-      address: {
-        name: "",
-        valid: false,
-        errtype: "error",
-        errors: "",
-        showerror: false,
-      },
-      showSuccess: false,
-      comprules: [],
-      mandatoryrules: [],
-      voluntaryrules: [],
-      config: {},
-      model: {},
-      schema: {},
-      formOptions: {
-        validateAfterChanged: true,
-        validateBeforeSubmit: true,
-        submitHandler: this.handleSubmit,
-        validationErrorClass: "new_error",
-      },
-    }
+  components: {
+    alert,
+    VueFormGenerator,
   },
-  async mounted() {
-    this.getFormScheme()
-    this.setupLayout()
-    this.loadRules()
-    this.fetchAddress()
-  },
+  setup() {
+    const router = useRouter()
+    const address = reactive({
+      name: "",
+      valid: false,
+      errtype: "error",
+      errors: "",
+      showerror: false,
+    })
+    const showSuccess = ref(false)
+    const comprules = ref([])
+    const mandatoryrules = ref([])
+    const voluntaryrules = ref([])
+    const config = reactive({})
+    const model = reactive({})
+    const schema = ref({})
+    const formOptions = reactive({
+      validateAfterChanged: true,
+      validateBeforeSubmit: true,
+      // submitHandler: this.handleSubmit,
+      validationErrorClass: "new_error",
+    })
 
-  methods: {
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+    onMounted(() => {
+      getFormScheme()
+      setupLayout()
+      loadRules()
+      fetchAddress()
+    })
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "pfontcolor", data.main_font_color)
-        this.$set(this.config, "shortlogo", data.logo_image)
+        config.mcolor = data.main_color
+        config.pfontcolor = data.main_font_color
+        config.shortlogo = data.logo_image
       }
-    },
-    // onValidated(isValid, errors) {},
-    onSubmit(form) {
-      return form
-    },
-    async getModel() {
+    }
+
+    const getModel = async () => {
       const token = auth.getAccessToken()
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       const modelOrderObject = {}
 
-      api.getUserData(token, passedCompanyId).then((result) => {
-        let response = result.data
-        if (response.data) {
-          let data = response.data
-          this.schema.fields.forEach((field) => {
-            const value =
-              !data[field.model] && field.type == "checkbox"
-                ? false
-                : data[field.model]
-            this.$set(this.model, field.model, value)
-          })
-        }
-      })
+      const result = await api.getUserData(token, passedCompanyId)
+      let response = result.data
+      if (response.data) {
+        let data = response.data
+        schema.value.fields.forEach((field) => {
+          const value =
+            !data[field.model] && field.type == "checkbox"
+              ? false
+              : data[field.model]
+          model[field.model] = value
+        })
+      }
 
       return modelOrderObject
-    },
+    }
 
-    /** Accept the rules */
-    doAccept() {
+    const doAccept = () => {
       const isValid = this.$refs.form.validate()
-      // if (!isValid) {
-      //   return
-      // }
-      const formData = this.model
-      this.comprules = [...this.mandatoryrules, ...this.voluntaryrules]
-      let items = this.comprules.filter((a) => a.selected == true)
-      const isMandatoryTermsSelected = this.mandatoryrules.every(
+      const formData = model
+      comprules.value = [...mandatoryrules.value, ...voluntaryrules.value]
+      let items = comprules.value.filter((a) => a.selected == true)
+      const isMandatoryTermsSelected = mandatoryrules.value.every(
         (rule) => rule.selected
       )
 
       if (!isMandatoryTermsSelected) {
-        this.address.errors = this.$t("Errors.NEED_REQUIRED_TERMS_ACCEPTANCE")
-        this.address.showerror = true
+        address.errors = this.$t("Errors.NEED_REQUIRED_TERMS_ACCEPTANCE")
+        address.showerror = true
         return
       }
 
@@ -204,80 +195,81 @@ export default {
         api
           .agreeCompanyRules(token, passedCompanyId, lang, ids)
           .then(() => {
-            this.movetoIndex()
+            movetoIndex()
           })
           .catch(() => {
-            this.movetoIndex()
+            movetoIndex()
           })
       }
-    },
-    /** Navigate to home page */
-    movetoIndex() {
+    }
+
+    const movetoIndex = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "home",
         query: { company_name: passedCompanyId },
       })
-    },
-    fetchAddress() {
+    }
+
+    const fetchAddress = async () => {
       let token = auth.getAccessToken()
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      api.getUserAddress(token, passedCompanyId).then((result) => {
-        let response = result.data
-        if (response.data) {
-          let data = response.data
-          this.address.name = data.name
-          this.address.surname = data.surname
-          this.address.phone = data.phone
-          this.address.nip = data.nip
-          this.isLoaded = true
-        }
-      })
-    },
-    /** Load the rules */
-    loadRules() {
+      const result = await api.getUserAddress(token, passedCompanyId)
+      let response = result.data
+      if (response.data) {
+        let data = response.data
+        address.name = data.name
+        address.surname = data.surname
+        address.phone = data.phone
+        address.nip = data.nip
+        address.isLoaded = true
+      }
+    }
+
+    const loadRules = async () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
       let lang = auth.getAppLanguage()
-      api
-        .getCompanyRules(token, passedCompanyId, lang)
-        .then((result) => {
-          let response = result.data
-          if (response.data.length != 0) {
-            let rules = response.data
-            rules.forEach((element) => {
-              element.selected = false
-              if (element.is_mandatory === "1") {
-                this.mandatoryrules.push(element)
-              } else {
-                this.voluntaryrules.push(element)
-              }
-            })
-          } else {
-            this.movetoIndex()
-          }
-        })
-        .catch((err) => {
-          let errormsg = err.data.message
-          if (errormsg === NO_COMPANY_FOUND) {
-            console.log(err)
-          }
-          this.movetoIndex()
-        })
-    },
-    namerule(value) {
+      try {
+        const result = await api.getCompanyRules(token, passedCompanyId, lang)
+        let response = result.data
+        if (response.data.length != 0) {
+          let rules = response.data
+          rules.forEach((element) => {
+            element.selected = false
+            if (element.is_mandatory === "1") {
+              mandatoryrules.value.push(element)
+            } else {
+              voluntaryrules.value.push(element)
+            }
+          })
+        } else {
+          movetoIndex()
+        }
+      } catch (err) {
+        let errormsg = err.data.message
+        if (errormsg === NO_COMPANY_FOUND) {
+          console.log(err)
+        }
+        movetoIndex()
+      }
+    }
+
+    const namerule = (value) => {
       if (!value) {
         return this.$t("PersonalData.REQUIRED")
       }
       return true
-    },
-    surnamerule(value) {
+    }
+
+    const surnamerule = (value) => {
       if (!value) {
         return this.$t("PersonalData.REQUIRED")
       }
       return true
-    },
-    phonerule(value) {
+    }
+
+    const phonerule = (value) => {
       const phoneNumberRegex =
         /^(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?[\d\s.-]{7,10}$/
       if (!value) {
@@ -287,8 +279,9 @@ export default {
         return this.$t("Errors.INVALID_PHONE")
       }
       return true
-    },
-    niprule(value) {
+    }
+
+    const niprule = (value) => {
       const nipRegex = /^\d{10}$/
       if (!value) {
         return this.$t("PersonalData.REQUIRED")
@@ -297,30 +290,46 @@ export default {
         return this.$t("Errors.INVALID_NIP")
       }
       return true
-    },
-    removeErrors() {
-      this.address.errors = ""
-      this.address.showerror = false
-    },
-    getFormScheme() {
+    }
+
+    const removeErrors = () => {
+      address.errors = ""
+      address.showerror = false
+    }
+
+    const getFormScheme = async () => {
       const passedCompanyId = companyconfig.getCompanyIdfromUrl()
       const token = auth.getAccessToken()
-      api.getCompanyRulesFormScheme(token, passedCompanyId).then((result) => {
-        let response = result.data
-        if (response.data) {
-          let data = response.data
-          this.schema = data
-          this.getModel()
-        }
-      })
-    },
-  },
-  components: {
-    alert,
-    VueFormGenerator,
+      const result = await api.getCompanyRulesFormScheme(token, passedCompanyId)
+      let response = result.data
+      if (response.data) {
+        let data = response.data
+        schema.value = data
+        getModel()
+      }
+    }
+
+    return {
+      address,
+      showSuccess,
+      comprules,
+      mandatoryrules,
+      voluntaryrules,
+      config,
+      model,
+      schema,
+      formOptions,
+      doAccept,
+      removeErrors,
+      namerule,
+      surnamerule,
+      phonerule,
+      niprule,
+    }
   },
 }
 </script>
+
 <style>
 fieldset {
   border: none;

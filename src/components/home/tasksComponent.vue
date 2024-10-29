@@ -8,7 +8,7 @@
       {{ $t("AppScreen.TASKS_TITLE") }}
     </div>
     <v-row v-if="config.taskLayout == 'Default'">
-      <v-col v-for="n in tasks" cols="12" md="4" :key="n.id">
+      <v-col v-for="n in tasks" :cols="12" :md="4" :key="n.id">
         <v-card
           ripple
           raised
@@ -67,7 +67,7 @@
     </v-row>
 
     <v-row v-if="config.taskLayout == 'PandG'">
-      <v-col v-for="n in tasks" cols="12" md="4" :key="n.id">
+      <v-col v-for="n in tasks" :cols="12" :md="4" :key="n.id">
         <v-card
           ripple
           outlined
@@ -144,6 +144,7 @@
 </template>
 
 <script>
+import { ref, reactive, onMounted } from "vue"
 import {
   SURVEY,
   INVITE,
@@ -155,83 +156,44 @@ import {
 import api from "@/services/fetchapi"
 import companyconfig from "@/core/companyconfig"
 import auth from "@/core/auth"
+import { i18n } from "@/plugins/i18n"
+
 export default {
-  data() {
-    return {
-      tasks: [],
-      model: "",
-      config: {},
-      fab: false,
-      showTasks: false,
-      C_SURVEY: SURVEY,
-      C_INVITE: INVITE,
-      C_QR_SCAN: QR_SCAN,
-      C_BILL: BILL,
-      showFabRight: false,
-    }
-  },
-  created() {
-    this.setupLayout()
-    this.loadtasks()
-  },
-  methods: {
-    openScan() {
-      for (let i = 0; i < this.tasks?.length; i++) {
-        if (this.tasks[i].type === "BILL") {
-          // console.log(this.tasks[i].id);
-          this.taskRedirect("BILL", this.tasks[i].id)
-        }
-      }
-    },
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+  setup() {
+    const tasks = ref([])
+    const model = ref("")
+    const config = reactive({})
+    const fab = ref(false)
+    const showTasks = ref(false)
+    const C_SURVEY = SURVEY
+    const C_INVITE = INVITE
+    const C_QR_SCAN = QR_SCAN
+    const C_BILL = BILL
+    const showFabRight = ref(false)
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
-        this.$set(this.config, "pcolor", data.primary_color)
-        this.$set(this.config, "pfontcolor", data.primary_font_color)
-        this.$set(this.config, "taskLayout", data.taskLayout)
+        config.mcolor = data.main_color
+        config.mfontcolor = data.main_font_color
+        config.pcolor = data.primary_color
+        config.pfontcolor = data.primary_font_color
+        config.taskLayout = data.taskLayout
         if (data.taskfabposition == "left") {
-          this.showFabRight = false
-          this.$set(this.config, "flexclass", "alignspeeddial")
+          showFabRight.value = false
+          config.flexclass = "alignspeeddial"
         } else {
-          this.showFabRight = true
-          this.$set(this.config, "flexclass", "alignspeeddialend")
+          showFabRight.value = true
+          config.flexclass = "alignspeeddialend"
         }
       }
-    },
-    /**
-     * Label string
-     */
-    getPoints(val) {
+    }
+
+    const getPoints = (val) => {
       return "+ " + parseInt(val) + " " + this.$t("AppScreen.POINTS")
-    },
-    /**
-     * Navigate to previous url
-     */
-    back() {
-      this.$router.push("/")
-    },
-    /**
-     * Convert Hex color to rgb
-     */
-    convertHex: function (color) {
-      color = color.replace("#", "")
-      let r = parseInt(color.substring(0, 2), 16)
-      let g = parseInt(color.substring(2, 4), 16)
-      let b = parseInt(color.substring(4, 6), 16)
-      let result = "rgba(" + r + "," + g + "," + b + "," + 0.8 + ")"
-      return result
-    },
-    /**
-     * Redirect to the task based on its type
-     * @param {string} taskType - Task type
-     * @param {int} id - Task id
-     */
-    taskRedirect(taskType, id) {
+    }
+
+    const taskRedirect = (taskType, id) => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       switch (taskType) {
         case BILL:
@@ -263,23 +225,21 @@ export default {
           })
           break
       }
-    },
-    /**
-     * Load the tasks as vertical cards
-     */
-    loadtasks() {
+    }
+
+    const loadtasks = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
-      let lang = this.$i18n.locale
+      let lang = i18n.global.locale
       api
         .getTasks(token, passedCompanyId, lang)
         .then((result) => {
           let response = result.data
-          this.tasks = response.data
-          this.showTasks = true
+          tasks.value = response.data
+          showTasks.value = true
         })
         .catch((err) => {
-          this.showTasks = false
+          showTasks.value = false
           let errormsg = err.data.message
           if (errormsg === NO_COMPANY_FOUND) {
             console.log(errormsg)
@@ -287,23 +247,38 @@ export default {
             console.log(errormsg)
           }
         })
-    },
+    }
+
+    onMounted(() => {
+      setupLayout()
+      loadtasks()
+    })
+
+    return {
+      tasks,
+      model,
+      config,
+      fab,
+      showTasks,
+      C_SURVEY,
+      C_INVITE,
+      C_QR_SCAN,
+      C_BILL,
+      showFabRight,
+      setupLayout,
+      getPoints,
+      taskRedirect,
+      loadtasks,
+    }
   },
 }
 </script>
+
 <style>
 .cardOutline {
   border-radius: 8px !important;
   border-width: thick !important;
 }
-/*
-  #task {
-    height: 100px;
-  }
-
-  #task .v-speed-dial {
-    position: absolute;
-  } */
 
 #task .v-btn--floating {
   position: relative;

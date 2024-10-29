@@ -14,11 +14,11 @@
         style="color: white"
         @click.stop="drawer = !drawer"
       ></v-app-bar-nav-icon>
-      <pageheader></pageheader>
+      <PageHeader></PageHeader>
       <template v-slot:extension v-if="config.showMenu">
         <v-tabs align-with-title v-model="tab" :color="config.mfontcolor">
-          <v-tabs-slider></v-tabs-slider>
-          <v-tab @click="navigatehome">Home</v-tab>
+          <!-- <v-tabs-slider></v-tabs-slider> -->
+          <v-tab @click="navigateHome">Home</v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
@@ -33,69 +33,73 @@
       v-model="drawer"
       absolute
       temporary
-      :style="`background-color:${config.menuColor};top: 0px`"
+      :style="`background-color:${config.menuColor};top: 65px`"
     >
-      <v-list-item class="px-2">
-        <v-list-item-avatar>
+      <v-list-item class="px-2 sidebar-title">
+        <v-avatar>
           <v-icon style="color: white">mdi-account-circle</v-icon>
-        </v-list-item-avatar>
+        </v-avatar>
 
         <v-list-item-title id="layoutUserID" style="color: white">
-          {{ $t("AppScreen.USER_ID") + ": " + loggedUser.user_id }}
+          <!-- {{ $t("AppScreen.USER_ID") + ": " + loggedUser.user_id }} -->
+          {{ loggedUser.user_id }}
         </v-list-item-title>
 
-        <v-btn icon @click.stop="drawer = !drawer">
-          <v-icon>mdi-chevron-left</v-icon>
+        <v-btn
+          variant="flat"
+          :color="config.menuColor"
+          icon
+          @click.stop="drawer = !drawer"
+        >
+          <v-icon color="white">mdi-chevron-left</v-icon>
         </v-btn>
       </v-list-item>
 
       <v-divider></v-divider>
-      <v-list nav dense>
-        <v-list-item-group>
-          <v-list-item>
-            <v-list-item-title @click="navigatehome" style="color: white">{{
-              $t("AppScreen.CONTEST")
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title @click="personaldata" style="color: white">{{
-              $t("AppScreen.MY_ACCOUNT")
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title @click="personalHistory" style="color: white">{{
-              $t("AppScreen.HISTORY")
-            }}</v-list-item-title>
-          </v-list-item>
-          <!-- <v-list-item>
+      <v-list nav dense v-model:selected="selectedItem">
+        <v-list-item value="home">
+          <v-list-item-title @click="navigateHome" style="color: white">{{
+            $t("AppScreen.CONTEST")
+          }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item value="account">
+          <v-list-item-title @click="personalData" style="color: white">{{
+            $t("AppScreen.MY_ACCOUNT")
+          }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item value="history">
+          <v-list-item-title @click="personalHistory" style="color: white">{{
+            $t("AppScreen.HISTORY")
+          }}</v-list-item-title>
+        </v-list-item>
+        <!-- <v-list-item>
             <v-list-item-title @click="receiptUpload" style="color: white"
               >Skanuj</v-list-item-title
             >
           </v-list-item> -->
-          <v-list-item>
-            <v-list-item-title @click="surveys" style="color: white">{{
-              $t("AppScreen.SURVEYS")
-            }}</v-list-item-title>
-          </v-list-item>
-          <!-- <v-list-item>
+        <v-list-item value="surveys">
+          <v-list-item-title @click="surveys" style="color: white">{{
+            $t("AppScreen.SURVEYS")
+          }}</v-list-item-title>
+        </v-list-item>
+        <!-- <v-list-item>
             <v-list-item-title @click="notifications" style="color: white"
               >Gry</v-list-item-title
             >
           </v-list-item> -->
-          <v-list-item>
-            <v-list-item-title @click="scoreboard" style="color: white">{{
-              $t("AppScreen.RESULTS")
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title @click="logout" style="color: white">{{
-              $t("AppScreen.LOG_OUT")
-            }}</v-list-item-title>
-          </v-list-item>
-        </v-list-item-group>
+        <v-list-item value="results">
+          <v-list-item-title @click="scoreboard" style="color: white">{{
+            $t("AppScreen.RESULTS")
+          }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item value="logout">
+          <v-list-item-title @click="logout" style="color: white">{{
+            $t("AppScreen.LOG_OUT")
+          }}</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-main class="min-height" :class="this.$route.name">
+    <v-main class="min-height" :class="$route.name">
       <div class="pa-0 mb-6">
         <router-view></router-view>
       </div>
@@ -105,71 +109,56 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue"
 import companyconfig from "@/core/companyconfig"
-import pageheader from "@/components/home/headerComponent"
+import PageHeader from "@/components/home/headerComponent"
 import auth from "@/core/auth"
-import Vue from "vue"
 import loginapi from "@/services/loginapi"
 import { NO_COMPANY_FOUND, NO_COMPANY_TASK_FOUND } from "@/appConstants"
 import api from "@/services/fetchapi"
 import AppFooter from "@/components/parts/footerComponent"
-// import {NO_COMPANY_FOUND, PASSWORD_RESET_SUCCESS, SMS_SENT} from "@/appConstants";
+import { i18n } from "@/plugins/i18n"
+import { useRouter } from "vue-router"
+
 export default {
-  data() {
-    return {
-      config: {},
-      companyname: "",
-      year: 0,
-      tab: "tab1",
-      drawer: false,
-      loggedUser: false,
-      tasks: {},
-    }
-  },
-  created() {
-    console.log("DEBUG: created called in module layout")
-    this.setupLayout()
-    this.loadtasks()
-    this.getUser()
-  },
-  computed: {
-    menuItems() {
-      let menuItems = [{ icon: "lock_open", title: "Home", link: "/Logout" }]
-      return menuItems
-    },
-  },
   components: {
-    pageheader,
+    PageHeader,
     AppFooter,
   },
-  methods: {
-    /** Navigate to home page */
-    navigatehome() {
+  setup() {
+    const router = useRouter()
+    const config = ref({})
+    const companyname = ref("")
+    const year = ref(0)
+    const tab = ref("tab1")
+    const drawer = ref(false)
+    const loggedUser = ref(false)
+    const tasks = ref({})
+    const selectedItem = ref(null)
+    const navigateHome = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "home",
         query: { company_name: passedCompanyId },
       })
-      this.drawer = false
-    },
+      drawer.value = false
+    }
 
-    /** Navigate to notifications page */
-    notifications() {
+    const notifications = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       try {
-        this.$router.push({
+        router.push({
           name: "notifications",
           query: { company_name: passedCompanyId },
         })
       } catch (error) {
         console.error(error)
       }
-      this.drawer = false
-    },
+      drawer.value = false
+    }
 
-    /** Navigate to survey page */
-    surveys() {
+    const surveys = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -179,27 +168,27 @@ export default {
         })
       }
 
-      this.$router.push({
+      router.push({
         name: "surveys",
         query: { company_name: passedCompanyId },
       })
-      this.drawer = false
-    },
+      drawer.value = false
+    }
 
-    receiptUpload() {
+    const receiptUpload = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      for (let i = 0; i < this.tasks?.length; i++) {
-        if (this.tasks[i].type === "BILL") {
-          this.$router.push({
+      for (let i = 0; i < tasks.value?.length; i++) {
+        if (tasks.value[i].type === "BILL") {
+          router.push({
             name: "receipt",
-            params: { id: this.tasks[i].id },
+            params: { id: tasks.value[i].id },
             query: { company_name: passedCompanyId },
           })
         }
       }
-    },
-    /** Navigate to scoreboard page */
-    scoreboard() {
+    }
+
+    const scoreboard = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -209,14 +198,14 @@ export default {
         })
       }
 
-      this.$router.push({
+      router.push({
         name: "scoreboard",
         query: { company_name: passedCompanyId },
       })
-      this.drawer = false
-    },
-    /** Navigate to userdata page */
-    personaldata() {
+      drawer.value = false
+    }
+
+    const personalData = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -226,13 +215,14 @@ export default {
         })
       }
 
-      this.$router.push({
+      router.push({
         name: "personaldata",
         query: { company_name: passedCompanyId },
       })
-      this.drawer = false
-    },
-    personalHistory() {
+      drawer.value = false
+    }
+
+    const personalHistory = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -242,43 +232,34 @@ export default {
         })
       }
 
-      this.$router.push({
+      router.push({
         name: "personalhistory",
         query: { company_name: passedCompanyId },
       })
-      this.drawer = false
-    },
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+      drawer.value = false
+    }
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "layout_has_close", data.layout_has_close)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
-        this.$set(this.config, "showMenu", data.showMenu)
-        this.$set(this.config, "menuColor", data.menu_color)
-        this.$set(this.config, "menuColorActive", data.menu_color_active)
+        config.value.mcolor = data.main_color
+        config.value.layout_has_close = data.layout_has_close
+        config.value.mfontcolor = data.main_font_color
+        config.value.showMenu = data.showMenu
+        config.value.menuColor = data.menu_color
+        config.value.menuColorActive = data.menu_color_active
       }
-      this.companyname = passedCompanyId
-      this.year = new Date().getFullYear()
-    },
-    /*
-    sendRegistrationEventGtag () {
-      if (typeof window.gtag != 'function') {
-        setTimeout(this.sendRegistrationEventGtag, 200);
-        return;
-      }
-      window.gtag('event', 'conversion', {'send_to': 'AW-298953983/U1FTCLTc-qMDEP_Zxo4B'});
-    },*/
-    getUser() {
+      companyname.value = passedCompanyId
+      year.value = new Date().getFullYear()
+    }
+
+    const getUser = () => {
       console.log("DEBUG: getUser called in layout")
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let data = companyconfig.getUserScheme(passedCompanyId)
       if (data != "" && data.user_id) {
-        this.loggedUser = data
+        loggedUser.value = data
         window.localStorage.setItem("system_user_id", data.user_id) //NEEDED FOR "SUPPORTBOARD" CHAT SYNCHRONIZATION
       } else {
         loginapi
@@ -295,7 +276,7 @@ export default {
               ) {
                 this.endRegistrationEventGtag()
               }
-              this.loggedUser = user
+              loggedUser.value = user
 
               //Save for future needs
               companyconfig.setUser(user, passedCompanyId)
@@ -306,9 +287,9 @@ export default {
             console.log(response)
           })
       }
-    },
-    /** Logout the user. */
-    logout() {
+    }
+
+    const logout = () => {
       if (typeof window.gtag !== "undefined") {
         window.gtag("event", "NEW_LOYALTY", {
           event_category: "authorization",
@@ -316,10 +297,10 @@ export default {
         })
       }
 
-      Vue.prototype.$token = null
+      // Vue.prototype.$token = null
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       companyconfig.resetCompanyLocals(passedCompanyId)
-      this.$router.push({
+      router.push({
         name: "welcome",
         query: {
           company_name: passedCompanyId,
@@ -327,28 +308,30 @@ export default {
       })
 
       auth.clearTokens()
-    },
-    closeWidget() {
+    }
+
+    const closeWidget = () => {
       parent.postMessage("close", "*")
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "home",
         query: { company_name: passedCompanyId },
       })
-    },
-    loadtasks() {
+    }
+
+    const loadTasks = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
-      let lang = this.$i18n.locale
+      let lang = i18n.global.locale
       api
         .getTasks(token, passedCompanyId, lang)
         .then((result) => {
           let response = result.data
-          this.tasks = response.data
-          this.showTasks = true
+          tasks.value = response.data
+          // this.showTasks = true
         })
         .catch((err) => {
-          this.showTasks = false
+          // this.showTasks = false
           let errormsg = err.data.message
           if (errormsg === NO_COMPANY_FOUND) {
             console.log(errormsg)
@@ -356,13 +339,50 @@ export default {
             console.log(errormsg)
           }
         })
-    },
+    }
+
+    onMounted(() => {
+      console.log("DEBUG: created called in module layout")
+      setupLayout()
+      loadTasks()
+      getUser()
+    })
+
+    return {
+      config,
+      companyname,
+      year,
+      tab,
+      drawer,
+      loggedUser,
+      tasks,
+      selectedItem,
+      navigateHome,
+      notifications,
+      surveys,
+      receiptUpload,
+      scoreboard,
+      personalData,
+      personalHistory,
+      setupLayout,
+      getUser,
+      logout,
+      closeWidget,
+      loadTasks,
+    }
   },
 }
 </script>
-<style>
+
+<style scoped>
 .min-height {
   min-height: 100vh;
   min-height: calc(let(--vh, 1vh) * 100);
+}
+
+::v-deep .sidebar-title > .v-list-item__content {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
 }
 </style>

@@ -219,7 +219,7 @@
                 <v-btn
                   :style="`background-color:${config.mcolor}`"
                   class="ma-2"
-                  @click="buyreward(product)"
+                  @click="buyReward(product)"
                 >
                   {{ $t("AppScreen.BUY") }} {{ product.price }}
                   {{ $t("AppScreen.BUY_POINTS") }}
@@ -275,111 +275,111 @@
 </template>
 
 <script>
+import { ref, reactive, onMounted, onBeforeMount } from "vue"
+import { useRouter } from "vue-router"
 import { NO_COMPANY_FOUND, NO_COMPANY_TASK_FOUND } from "@/appConstants"
 import api from "@/services/fetchapi"
 import gameconfig from "@/services/gameconfigapi"
 import companyconfig from "@/core/companyconfig"
 import auth from "@/core/auth"
-import config from "@/variable"
 import Receipt from "@/views/home/tasks/receiptTask.vue"
-import Vue from "vue"
-//import VueContentLoading from "vue-content-loading";
+import { i18n } from "@/plugins/i18n"
+import { useI18n } from "vue-i18n"
 export default {
   components: {
-    //VueContentLoading
     Receipt,
   },
-  data() {
-    return {
-      model: [],
-      rewards: [],
-      index: 0,
-      notifications: 0,
-      showRewards: false,
-      showNotification: false,
-      config: {},
-      loaded: false,
-      tasks: {},
-      totalPoints: 0,
-      totalPointsUrl: config.apiEndrpoint + "/getpoints",
-      productsExpanded: [],
-      productAlerts: [],
-      receiptGamificationId: "",
-      gameId: "",
-      gameType: "",
-      win_points: null,
-    }
-  },
-  mounted() {
-    this.setAnalitycsDimention()
-  },
-  async created() {
-    this.loadRewards()
-    this.setupLayout()
-    // this.setAnalitycsDimention()
-    this.loadtasks()
-    this.getNotifications()
-    this.getTotalPoints()
-    this.loadGameConfig()
-  },
-  methods: {
-    setupLayout() {
+  setup() {
+    const { t } = useI18n()
+    const router = useRouter()
+
+    const model = ref([])
+    const rewards = ref([])
+    const index = ref(0)
+    const notifications = ref(0)
+    const showRewards = ref(false)
+    const showNotification = ref(false)
+    const config = reactive({})
+    const loaded = ref(false)
+    const tasks = ref({})
+    const totalPoints = ref(0)
+    const totalPointsUrl = config.apiEndrpoint + "/getpoints"
+    const productsExpanded = ref([])
+    const productAlerts = ref([])
+    const receiptGamificationId = ref("")
+    const gameId = ref("")
+    const gameType = ref("")
+    const win_points = ref(null)
+
+    onMounted(() => {
+      setAnalyticsDimension()
+    })
+
+    onBeforeMount(async () => {
+      await loadRewards()
+      setupLayout()
+      loadTasks()
+      getNotifications()
+      getTotalPoints()
+      loadGameConfig()
+    })
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
-        this.$set(this.config, "pcolor", data.primary_color)
-        this.$set(this.config, "pfontcolor", data.primary_font_color)
-        this.$set(this.config, "rewardLayout", data.rewardLayout)
-        Vue.set(this.config, "outercolor", data.layout_background_color_outer)
-        Vue.set(this.config, "innercolor", data.layout_background_color_inner)
+        config.mcolor = data.main_color
+        config.mfontcolor = data.main_font_color
+        config.pcolor = data.primary_color
+        config.pfontcolor = data.primary_font_color
+        config.rewardLayout = data.rewardLayout
+        config.outercolor = data.layout_background_color_outer
+        config.innercolor = data.layout_background_color_inner
         if (data.rewardLayout == "Cocacola") {
-          this.$set(this.config, "marginright", "0px")
+          config.marginright = "0px"
         } else if (data.rewardLayout == "PandD") {
-          this.$set(this.config, "marginright", "16px")
+          config.marginright = "16px"
           if (data.shadowDirection == "right") {
-            this.$set(this.config, "shadowhOffset", data.shadowSize + "px")
-            this.$set(this.config, "shadowvOffset", data.shadowSize + "px")
+            config.shadowhOffset = data.shadowSize + "px"
+            config.shadowvOffset = data.shadowSize + "px"
           } else if (data.shadowDirection == "left") {
-            this.$set(this.config, "shadowhOffset", data.shadowSize * -1 + "px")
-            this.$set(this.config, "shadowvOffset", data.shadowSize + "px")
+            config.shadowhOffset = data.shadowSize * -1 + "px"
+            config.shadowvOffset = data.shadowSize + "px"
           } else if (data.shadowDirection == "bottom") {
-            this.$set(this.config, "shadowhOffset", data.shadowSize + "px")
-            this.$set(this.config, "shadowvOffset", data.shadowSize + "px")
+            config.shadowhOffset = data.shadowSize + "px"
+            config.shadowvOffset = data.shadowSize + "px"
           } else if (data.shadowDirection == "top") {
-            this.$set(this.config, "shadowhOffset", data.shadowSize + "px")
-            this.$set(this.config, "shadowvOffset", data.shadowSize * -1 + "px")
+            config.shadowhOffset = data.shadowSize + "px"
+            config.shadowvOffset = data.shadowSize * -1 + "px"
           }
-          this.$set(this.config, "shadowOpacity", data.shadowOpacity + "px")
-          this.$set(this.config, "shadowcolor", data.shadowColor)
-          this.$set(this.config, "shadowSize", data.shadowSize + "px")
+          config.shadowOpacity = data.shadowOpacity + "px"
+          config.shadowcolor = data.shadowColor
+          config.shadowSize = data.shadowSize + "px"
         }
       }
-    },
-    goToReceiptGamification() {
+    }
+
+    const goToReceiptGamification = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      for (let i = 0; i < this.tasks?.length; i++) {
-        if (this.tasks[i].type === "BILL") {
-          this.$router.push({
+      for (let i = 0; i < tasks.value.length; i++) {
+        if (tasks.value[i].type === "BILL") {
+          router.push({
             name: "receipt",
-            params: { id: this.tasks[i].id },
+            params: { id: tasks.value[i].id },
             query: { company_name: passedCompanyId },
           })
         }
       }
-    },
-    getReceiptGamification(data) {
-      for (let i = 0; i < data?.length; i++) {
+    }
+
+    const getReceiptGamification = (data) => {
+      for (let i = 0; i < data.length; i++) {
         if (data[i].type === "BILL") {
-          this.receiptGamificationId = data[i].id
+          receiptGamificationId.value = data[i].id
         }
       }
-    },
-    /**
-     * Load the scoreboard
-     * @param {decimal} productprice - Less Expensive product price
-     */
-    getNotifications() {
+    }
+
+    const getNotifications = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
       api
@@ -387,45 +387,35 @@ export default {
         .then((result) => {
           let response = result.data
           if (response) {
-            this.notifications = response.notifications.length
+            notifications.value = response.notifications.length
           }
         })
         .catch((err) => {
           console.error(err)
         })
-    },
-    goGame() {
-      let company = companyconfig.getCompanyScheme()
-      const userId = Vue.localStorage.get("system_user_id")
+    }
 
-      // let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+    const goGame = () => {
+      let company = companyconfig.getCompanyScheme()
+      const userId = localStorage.getItem("system_user_id")
       let token = auth.getAccessToken()
 
-      switch (this.gameType) {
+      switch (gameType.value) {
         case "MATCH":
-          this.goMatchGame(company.active_game, company.id, userId, token)
+          goMatchGame(company.active_game, company.id, userId, token)
           break
         case "WHEEL":
-          this.goWheelGame(company.active_game, token)
+          goWheelGame(company.active_game, token)
           break
       }
-    },
-    getcolor() {
-      let x = this.colors[Math.floor(Math.random() * this.colors.length)]
-      return x
-    },
-    /**
-     * Go to previous url
-     */
-    back() {
-      this.$router.go("-1")
-    },
-    /**
-     *  Go to match game
-     */
-    goMatchGame(active_game, company_id, userId, token) {
+    }
+
+    const back = () => {
+      router.go(-1)
+    }
+
+    const goMatchGame = (active_game, company_id, userId, token) => {
       window.location.href =
-        // "http://127.0.0.1:5501/?" +
         "https://matchgame.web.app/?" +
         "game_id=" +
         active_game +
@@ -435,93 +425,55 @@ export default {
         userId +
         "&token=" +
         token
-    },
-    /**
-     *  Go to fortune wheel game
-     */
-    goWheelGame(active_game, token) {
-      // window.location.href =
-      //   "http://localhost:5173/fortune-wheel/?" + "access_token=" + token
+    }
+
+    const goWheelGame = (active_game, token) => {
       window.location.href =
         "https://fortunegame.web.app/?" +
         "game_id=" +
         active_game +
         "&access_token=" +
         token
-    },
-    /**
-     * Generate the Label shown
-     */
-    getPoints(val) {
-      return (
-        this.$t("AppScreen.PRICE") +
-        ": " +
-        val +
-        " " +
-        this.$t("AppScreen.POINTS")
-      )
-    },
-    getPointsLabel(val) {
-      return val + " " + this.$t("AppScreen.POINTS")
-    },
-    /**
-     * Action for Next button for scrolling the cards
-     */
-    triggernext() {
-      this.$refs.myslide.scrollTo("next")
-    },
-    /**
-     * Action for Previous button for scrolling the cards
-     */
-    triggerprev() {
-      this.$refs.myslide.scrollTo("prev")
-    },
-    /**
-     * Action for Previous button for scrolling the cards
-     */
-    convertHex: function (color) {
+    }
+
+    const getPoints = (val) => {
+      return t("AppScreen.PRICE") + ": " + val + " " + t("AppScreen.POINTS")
+    }
+
+    const getPointsLabel = (val) => {
+      return val + " " + t("AppScreen.POINTS")
+    }
+
+    const convertHex = (color) => {
       color = color.replace("#", "")
       let r = parseInt(color.substring(0, 2), 16)
       let g = parseInt(color.substring(2, 4), 16)
       let b = parseInt(color.substring(4, 6), 16)
       let result = "rgba(" + r + "," + g + "," + b + "," + 0.5 + ")"
       return result
-    },
-    /**
-     * Redirect to reward details
-     * @param {string} rewardType - Reward Type
-     * @param {string} rID - Reward ID
-     * TARASCHANGE
-     */
-    //rewardRedirect(rewardType, rId) {
-    //  console.log(rewardType);
-    //  console.log(rId);
-    //  return;
-    //},
-    rewardRedirect(rewardType, rId) {
-      //   return;
+    }
+
+    const rewardRedirect = (rewardType, rId) => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "rewardinfo",
         params: { type: rewardType, id: rId },
         query: { company_name: passedCompanyId },
       })
-    },
-    loadGameConfig() {
+    }
+
+    const loadGameConfig = () => {
       let company = companyconfig.getCompanyScheme()
       gameconfig.getGameConfig(company.active_game).then((response) => {
-        this.gameType = response.data.type
-        this.win_points = response.data.win_points
+        gameType.value = response.data.type
+        win_points.value = response.data.win_points
       })
-    },
+    }
 
-    /**
-     * Fetch and load the rewards as cards
-     */
-    loadRewards() {
+    const loadRewards = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
-      let lang = this.$i18n.locale
+      let lang = i18n.global.locale
 
       api
         .getProducts(token, passedCompanyId, lang)
@@ -529,41 +481,43 @@ export default {
           let response = result.data
           if (Object.keys(response.data).length != 0) {
             let data = response.data
-            this.rewards = data.reverse() //TODO: TARAS HARDCODE
-            this.showRewards = true
+            rewards.value = data.reverse()
+            showRewards.value = true
           } else {
-            this.showRewards = false
+            showRewards.value = false
           }
-          this.loaded = true
+          loaded.value = true
         })
         .catch((err) => {
           let errormsg = err.data.message
           if (errormsg === NO_COMPANY_FOUND) {
             console.error(err)
           }
-          this.showRewards = false
+          showRewards.value = false
         })
-    },
-    setAnalitycsDimention() {
-      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$gtag.config("G-TB06WMS3NZ", {
-        company_id: passedCompanyId,
-      })
-    },
-    loadtasks() {
+    }
+
+    const setAnalyticsDimension = () => {
+      // let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+      // gtag("config", "G-TB06WMS3NZ", {
+      //   company_id: passedCompanyId,
+      // })
+    }
+
+    const loadTasks = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
-      let lang = this.$i18n.locale
+      let lang = i18n.global.locale
       api
         .getTasks(token, passedCompanyId, lang)
         .then((result) => {
           let response = result.data
-          this.tasks = response.data
-          this.showTasks = true
-          this.getReceiptGamification(response.data)
+          tasks.value = response.data
+          // showTasks.value = true
+          getReceiptGamification(response.data)
         })
         .catch((err) => {
-          this.showTasks = false
+          // showTasks.value = false
           let errormsg = err.data.message
           if (errormsg === NO_COMPANY_FOUND) {
             console.error(errormsg)
@@ -571,8 +525,9 @@ export default {
             console.error(errormsg)
           }
         })
-    },
-    getTotalPoints: function () {
+    }
+
+    const getTotalPoints = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
 
@@ -581,10 +536,9 @@ export default {
         .then((result) => {
           let json = result.data
           if (json.points.length > 0) {
-            this.totalPoints = json.points[0].money.toFixed(2)
-            // this.totalPoints = "1000.00"
+            totalPoints.value = json.points[0].money.toFixed(2)
           } else {
-            this.totalPoints = 0.0
+            totalPoints.value = 0.0
           }
         })
         .catch((err) => {
@@ -595,47 +549,51 @@ export default {
             console.error(errormsg)
           }
         })
-    },
-    expandProductInfo(product) {
-      if (this.productsExpanded.includes(product.id)) {
-        this.productsExpanded.splice(
-          this.productsExpanded.indexOf(product.id),
+    }
+
+    const expandProductInfo = (product) => {
+      if (productsExpanded.value.includes(product.id)) {
+        productsExpanded.value.splice(
+          productsExpanded.value.indexOf(product.id),
           1
         )
       } else {
-        this.productsExpanded.push(product.id)
+        productsExpanded.value.push(product.id)
       }
-    },
-    goScoreboard() {
+    }
+
+    const goScoreboard = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
-        // eslint-disable-next-line no-undef
         window.gtag("event", "NEW_LOYALTY", {
           event_category: "page_open",
           value: "scoreboard",
         })
       }
 
-      this.$router.push({
+      router.push({
         name: "scoreboard",
         query: { company_name: passedCompanyId },
       })
-    },
-    goToGamification() {
+    }
+
+    const goToGamification = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "gamification",
         query: { company_name: passedCompanyId },
       })
-    },
-    isExpandedProductInfo(product) {
-      return this.productsExpanded.includes(product.id)
-    },
-    buyreward(product) {
-      if (parseFloat(this.totalPoints) < parseFloat(product.price)) {
-        this.productAlerts.splice(this.productAlerts.indexOf(product.id), 1)
-        this.productAlerts.push(product.id)
+    }
+
+    const isExpandedProductInfo = (product) => {
+      return productsExpanded.value.includes(product.id)
+    }
+
+    const buyReward = (product) => {
+      if (parseFloat(totalPoints.value) < parseFloat(product.price)) {
+        productAlerts.value.splice(productAlerts.value.indexOf(product.id), 1)
+        productAlerts.value.push(product.id)
         if (typeof window.gtag !== "undefined") {
           window.gtag("event", "NEW_LOYALTY", {
             event_category: "purchase",
@@ -644,13 +602,55 @@ export default {
         }
       } else {
         let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-        this.$router.push({
+        router.push({
           name: "buyreward",
           params: { id: product.id },
           query: { company_name: passedCompanyId },
         })
       }
-    },
+    }
+
+    return {
+      model,
+      rewards,
+      index,
+      notifications,
+      showRewards,
+      showNotification,
+      config,
+      loaded,
+      tasks,
+      totalPoints,
+      totalPointsUrl,
+      productsExpanded,
+      productAlerts,
+      receiptGamificationId,
+      gameId,
+      gameType,
+      win_points,
+      setupLayout,
+      goToReceiptGamification,
+      getReceiptGamification,
+      getNotifications,
+      goGame,
+      back,
+      goMatchGame,
+      goWheelGame,
+      getPoints,
+      getPointsLabel,
+      convertHex,
+      rewardRedirect,
+      loadGameConfig,
+      loadRewards,
+      setAnalyticsDimension,
+      loadTasks,
+      getTotalPoints,
+      expandProductInfo,
+      goScoreboard,
+      goToGamification,
+      isExpandedProductInfo,
+      buyReward,
+    }
   },
 }
 </script>
@@ -659,9 +659,6 @@ export default {
   font-family: Gotham;
   src: url("~@/assets/fonts/Gotham/Gotham-Bold.otf") format("opentype");
 }
-
-/*@font-face {font-family: "Gotham Medium"; src: url("//db.onlinewebfonts.com/t/9a2bc11be56851dde98c1b49302cc21a.eot"); src: url("//db.onlinewebfonts.com/t/9a2bc11be56851dde98c1b49302cc21a.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/9a2bc11be56851dde98c1b49302cc21a.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/9a2bc11be56851dde98c1b49302cc21a.woff") format("woff"), url("//db.onlinewebfonts.com/t/9a2bc11be56851dde98c1b49302cc21a.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/9a2bc11be56851dde98c1b49302cc21a.svg#Gotham Medium") format("svg"); }*/
-/*@font-face {font-family: "TCCC-UnityCondensed"; src: url("//db.onlinewebfonts.com/t/d3346109f294e9afb85ec699713859ad.eot"); src: url("//db.onlinewebfonts.com/t/d3346109f294e9afb85ec699713859ad.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/d3346109f294e9afb85ec699713859ad.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/d3346109f294e9afb85ec699713859ad.woff") format("woff"), url("//db.onlinewebfonts.com/t/d3346109f294e9afb85ec699713859ad.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/d3346109f294e9afb85ec699713859ad.svg#TCCC-UnityCondensed") format("svg"); }*/
 
 #close-widget-btn i {
   color: #000 !important;
@@ -674,9 +671,6 @@ main.home {
 
 .monster-wrapper {
   padding: 0;
-}
-
-.monster-block-1 {
 }
 
 .monster-block-2 {

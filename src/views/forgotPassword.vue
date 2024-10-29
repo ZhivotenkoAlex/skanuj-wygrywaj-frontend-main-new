@@ -2,7 +2,7 @@
   <v-main>
     <div
       style="position: absolute; top: 20px; right: 20px; cursor: pointer"
-      onclick="parent.postMessage('close', '*')"
+      @click="closeWindow"
     >
       <v-icon
         large
@@ -63,7 +63,7 @@
             config.mfontcolor +
             ` !important;font-size: 21px;margin-top: 15px;`
           "
-          @click="goback"
+          @click="goBack"
         >
           <v-icon :style="`font-size: 16px;color: ` + config.mfontcolor + `;`"
             >mdi-arrow-left</v-icon
@@ -73,19 +73,30 @@
         <v-col cols="12" align="center" justify="center">
           <v-tabs
             :color="config.mfontcolor"
-            height="60px"
             centered
             fixed-tabs
             hide-slider
+            v-model="tab"
+            :bg-color="config.mcolor"
           >
             <v-tab
               ripple
+              value="forgotForm"
               v-text="$t('LoginScreen.FORGOT_PASSWORD')"
               class="monster-login-using"
             ></v-tab>
-            <v-tab-item>
-              <v-card flat elevation="n-7" class="pt-10 monster-login-panel">
-                <v-form ref="form" v-model="chngpassword.valid">
+          </v-tabs>
+          <v-tabs-window
+            v-model="tab"
+            :style="`background-color:${config.mcolor}`"
+          >
+            <v-tabs-window-item value="forgotForm">
+              <v-card
+                flat
+                class="pt-10 monster-login-panel"
+                :style="`background-color:#fff9`"
+              >
+                <v-form ref="formRef" v-model="chngpassword.valid">
                   <v-row justify="center">
                     <v-col cols="10">
                       <alert
@@ -101,143 +112,157 @@
                         persistent-hint
                         :rules="[
                           (value) => {
-                            return agreerule(value)
+                            return agreeRule(value)
                           },
                         ]"
                       ></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-card-actions>
-                    <v-flex class="text-center">
-                      <v-btn
-                        block
-                        @click="doChangePassword"
-                        v-text="$t('LoginScreen.CHANGE_PASSWORD')"
-                        class="login-form-btn"
-                        :style="`color:#fff;background-color:#000;`"
-                      ></v-btn>
-                    </v-flex>
+                  <v-card-actions style="justify-content: center">
+                    <!-- <v-flex class="text-center"> -->
+                    <v-btn
+                      block
+                      @click="doChangePassword"
+                      v-text="$t('LoginScreen.CHANGE_PASSWORD')"
+                      class="login-form-btn"
+                      :style="`color:#fff;background-color:${config.forgotbg};width: 100%`"
+                    ></v-btn>
+                    <!-- </v-flex> -->
                   </v-card-actions>
                 </v-form>
               </v-card>
-            </v-tab-item>
-          </v-tabs>
+            </v-tabs-window-item>
+          </v-tabs-window>
         </v-col>
       </v-row>
     </v-container>
     <AppFooter> </AppFooter>
   </v-main>
 </template>
+
 <script>
+import { ref, onMounted, reactive } from "vue"
+import { useRouter } from "vue-router"
 import { PASSWORD_RESET_SUCCESS, NO_COMPANY_FOUND } from "@/appConstants"
-import Vue from "vue"
 import loginapi from "@/services/loginapi"
 import companyconfig from "@/core/companyconfig"
 import alert from "@/components/shared/errorAlert"
 import AppFooter from "@/components/parts/footerComponent"
+import { useI18n } from "vue-i18n"
 
 export default {
-  data: () => ({
-    chngpassword: {
+  components: {
+    alert,
+    AppFooter,
+  },
+  setup() {
+    const { t } = useI18n()
+    const router = useRouter()
+    const formRef = ref(null)
+    const chngpassword = reactive({
       email: "",
       valid: true,
       errors: "",
       showerr: false,
       errType: "error",
-    },
-    config: {},
-  }),
-  created() {
-    this.setupLayout()
-  },
-  mounted() {
-    this.styleTag = document.createElement("style")
-    this.styleTag.appendChild(document.createTextNode(this.config.custom_css))
-    document.head.appendChild(this.styleTag)
-  },
-  methods: {
-    /** Navigate to previous url */
-    goback() {
-      this.$router.go(-1)
-    },
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+    })
+    const config = reactive({})
+    const tab = ref("forgotForm")
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        Vue.set(this.config, "logo", data.logo_image)
-        Vue.set(this.config, "forgotbg", data.Forgot_btn_bg)
-        Vue.set(this.config, "forgotcolor", data.Forgot_btn_color)
-        Vue.set(this.config, "cancelbg", data.Cancel_btn_bg)
-        Vue.set(this.config, "cancelcolor", data.Cancel_btn_color)
-        Vue.set(this.config, "logintabbg", data.Login_Tab_bg)
-        Vue.set(this.config, "logintabcolor", data.Login_Tab_color)
-        Vue.set(this.config, "line1", data.login_text_1_line)
-        Vue.set(this.config, "line2", data.login_text_2_line)
-        Vue.set(this.config, "mcolor", data.main_color)
-        Vue.set(this.config, "mfontcolor", data.main_font_color)
-        Vue.set(this.config, "pcolor", data.primary_color)
-        Vue.set(this.config, "pfontcolor", data.primary_font_color)
-        Vue.set(this.config, "background_color", data.background_color)
-        Vue.set(this.config, "login_logo", data.login_logo)
-        Vue.set(this.config, "custom_css", data.layout_custom_css)
-        Vue.set(this.config, "login_pic", data.login_pic)
+        config.logo = data.logo_image
+        config.forgotbg = data.Forgot_btn_bg || data.main_color
+        config.forgotcolor = data.Forgot_btn_color
+        config.cancelbg = data.Cancel_btn_bg
+        config.cancelcolor = data.Cancel_btn_color
+        config.logintabbg = data.Login_Tab_bg
+        config.logintabcolor = data.Login_Tab_color
+        config.line1 = data.login_text_1_line
+        config.line2 = data.login_text_2_line
+        config.mcolor = data.main_color
+        config.mfontcolor = data.main_font_color
+        config.pcolor = data.primary_color
+        config.pfontcolor = data.primary_font_color
+        config.background_color = data.background_color
+        config.login_logo = data.login_logo
+        config.custom_css = data.layout_custom_css
+        config.login_pic = data.login_pic
       }
-    },
-    /** Submit the password to api to get the password reset email */
-    doChangePassword() {
-      let isvalid = this.$refs.form.validate()
-      if (isvalid) {
-        this.chngpassword.showerr = false
+    }
+
+    const goBack = () => {
+      router.go(-1)
+    }
+
+    const doChangePassword = async () => {
+      let isvalid = await formRef.value.validate()
+      if (isvalid.valid) {
+        chngpassword.showerr = false
         let url = companyconfig.getCompanyIdfromUrl()
         let isLegacyMode = companyconfig.isLegacyMode(url)
         loginapi
-          .doPasswordChange(this.chngpassword.email, url, isLegacyMode)
+          .doPasswordChange(chngpassword.email, url, isLegacyMode)
           .then((response) => {
             let msg = response.data.message
             if (msg === PASSWORD_RESET_SUCCESS) {
-              this.chngpassword.errors = this.$t(
-                "LoginScreen.PASSWORD_RESET_SUCCESS"
-              )
-              this.chngpassword.showerr = true
-              this.chngpassword.errType = "success"
-              this.$refs.form.reset()
-              this.goback()
+              chngpassword.errors = t("LoginScreen.PASSWORD_RESET_SUCCESS")
+              chngpassword.showerr = true
+              chngpassword.errType = "success"
+              formRef.value.reset()
+              goBack()
             } else {
-              this.chngpassword.errors = this.$t("Errors.ACCOUNT_NOT_FOUND")
-              this.chngpassword.showerr = true
-              this.chngpassword.errType = "error"
+              chngpassword.errors = t("Errors.ACCOUNT_NOT_FOUND")
+              chngpassword.showerr = true
+              chngpassword.errType = "error"
             }
           })
           .catch((response) => {
             let errormsg = response.data.message
             if (errormsg === NO_COMPANY_FOUND) {
-              this.chngpassword.errors = this.$t("Errors.NO_COMPANY_FOUND")
+              chngpassword.errors = t("Errors.NO_COMPANY_FOUND")
             } else {
-              this.chngpassword.errors = this.$t("Errors.ACCOUNT_NOT_FOUND")
+              chngpassword.errors = t("Errors.ACCOUNT_NOT_FOUND")
             }
-            this.chngpassword.errType = "error"
-            this.chngpassword.showerr = true
+            chngpassword.errType = "error"
+            chngpassword.showerr = true
           })
       }
-    },
-    /** Change Password validations  */
-    agreerule(value) {
+    }
+
+    const agreeRule = (value) => {
       const regexp =
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       if (!value) {
-        return this.$t("LoginScreen.EMAIL_REQUIRED")
+        return t("LoginScreen.EMAIL_REQUIRED")
       }
       if (!regexp.test(value)) {
-        return this.$t("LoginScreen.EMAIL_VALID")
+        return t("LoginScreen.EMAIL_VALID")
       }
       return true
-    },
-  },
-  components: {
-    alert,
-    AppFooter,
+    }
+
+    const closeWindow = () => {
+      parent.postMessage("close", "*")
+    }
+
+    onMounted(() => {
+      setupLayout()
+      const styleTag = document.createElement("style")
+      styleTag.appendChild(document.createTextNode(config.custom_css))
+      document.head.appendChild(styleTag)
+    })
+
+    return {
+      chngpassword,
+      config,
+      tab,
+      formRef,
+      goBack,
+      doChangePassword,
+      agreeRule,
+      closeWindow,
+    }
   },
 }
 </script>

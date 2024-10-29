@@ -76,40 +76,33 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue"
 import companyconfig from "@/core/companyconfig"
 import auth from "@/core/auth"
-import Vue from "vue"
+import { useRouter } from "vue-router"
+
 export default {
-  data() {
-    return {
-      config: {},
-    }
-  },
-  created() {
-    this.setupLayout()
-  },
-  methods: {
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+  setup() {
+    const config = ref({})
+    const router = useRouter()
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
-        this.$set(this.config, "shortlogo", data.logo_image)
-        this.$set(this.config, "showLogo", data.showLogo)
-        this.$set(this.config, "showMenu", data.showMenu)
-        this.$set(this.config, "logoPosition", data.logoPosition)
-        this.$set(this.config, "companyName", data.name)
+        config.value.mcolor = data.main_color
+        config.value.mfontcolor = data.main_font_color
+        config.value.shortlogo = data.logo_image
+        config.value.showLogo = data.showLogo
+        config.value.showMenu = data.showMenu
+        config.value.logoPosition = data.logoPosition
+        config.value.companyName = data.name
       }
-    },
+    }
 
-    /** Logout the user. */
-    logout() {
-      Vue.prototype.$token = null
+    const logout = () => {
+      config.value.token = null
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "welcome",
         query: {
           company_name: passedCompanyId,
@@ -117,10 +110,20 @@ export default {
       })
 
       auth.clearTokens()
-    },
+    }
+
+    onMounted(() => {
+      setupLayout()
+    })
+
+    return {
+      config,
+      logout,
+    }
   },
 }
 </script>
+
 <style>
 .divFlex {
   display: flex;

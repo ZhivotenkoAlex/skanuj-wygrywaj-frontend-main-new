@@ -543,6 +543,7 @@ export default {
                   lang
                 )
                 .then(function (response) {
+                  console.log("🚀 ~ response:", response)
                   if (response === true) {
                     router.push({
                       name: "rules",
