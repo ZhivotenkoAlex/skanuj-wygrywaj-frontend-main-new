@@ -9,14 +9,14 @@
       >
         <template v-if="isDescriptionShown">
           <v-card>
-            <v-tabs fixed-tabs>
+            <v-tabs fixed-tabs v-model="tab">
               <v-tab
                 style="border-top-left-radius: 5px"
                 :style="`background-color:${
                   results.length > 0 ? config.pcolor + '4d' : config.pcolor
                 };`"
                 class="tabs"
-                :key="1"
+                value="1"
               >
                 <div style="display: flex; flex-direction: row; gap: 5px">
                   <v-icon size="15px" color="white">mdi-barcode</v-icon>
@@ -28,7 +28,7 @@
                   results.length > 0 ? config.pcolor + '4d' : config.pcolor
                 };`"
                 class="tabs"
-                :key="2"
+                value="2"
               >
                 <div style="display: flex; flex-direction: row; gap: 5px">
                   <v-icon size="15px" color="white">mdi-email</v-icon>
@@ -40,145 +40,144 @@
                   results.length > 0 ? config.pcolor + '4d' : config.pcolor
                 }; border-top-right-radius: 5px;`"
                 class="tabs"
-                :key="3"
+                value="3"
                 ><div style="display: flex; flex-direction: row; gap: 5px">
                   <v-icon size="15px" color="white">mdi-link</v-icon>
                   <span class="tab_title">Link</span>
                 </div>
               </v-tab>
-              <v-tab-item v-for="n in 3" :key="n">
-                <v-card flat>
-                  <v-card-text v-if="n === 1">
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        justify-content: space-around;
-                        padding: 16px;
-                      "
-                    >
-                      <div
-                        style="
-                          display: flex;
-                          flex-direction: column;
-                          align-items: center;
-                        "
-                      >
-                        <p
-                          :style="`color:${config.mfontcolor}; font-size:16px; padding-bottom:16px;`"
-                        >
-                          {{ $t("TaskScreen.YOUR_INVITE_CODE") }}:
-                        </p>
-                        <p
-                          :style="`color:${config.mfontcolor};font-weight:bold;font-size:14px;padding-bottom:16px;`"
-                        >
-                          {{ inviteCode }}
-                        </p>
-                        <v-btn
-                          :style="`background-color:${config.mcolor}`"
-                          class="ml-2"
-                          height="25px"
-                          @click="copyCodeToClipboard"
-                        >
-                          {{ $t("TaskScreen.COPY_INVITE_CODE") }}
-                        </v-btn>
-                      </div>
-                    </div>
-                  </v-card-text>
-                  <v-card-text v-if="n === 2">
-                    <div
-                      :style="`color:${config.mfontcolor};display: flex;flex-direction: column;align-items: center;gap: 10px;justify-content: space-around; padding:10px;`"
-                    >
-                      <p style="font-size: 16px; padding-bottom: 16px">
-                        {{ $t("TaskScreen.SEND_INVITE_CODE_EMAIL") }}
-                      </p>
-                      <v-card
-                        :style="`padding: 10px; border: 1px solid ${config.mfontcolor}`"
-                      >
-                        <v-card-text
-                          style="font-weight: 700"
-                          v-html="email_subject"
-                        />
-                        <v-card-text v-html="email_body" />
-                      </v-card>
-                      <p style="text-align: center">
-                        {{ $t("TaskScreen.SEND_EMAIL_DESCRIPTION") }}
-                      </p>
-                      <v-text-field
-                        solo
-                        data-test="email"
-                        id="invite-email"
-                        name="inviteEmail"
-                        type="text"
-                        autocomplete="off"
-                        v-model="emailToSend"
-                        style="width: 300px"
-                        class="link"
-                        ref="inviteEmail"
-                        :placeholder="
-                          $t('TaskScreen.EMAIL_PLACEHOLDER') + '...'
-                        "
-                        :rules="[
-                          (value) => {
-                            return emailRule(value)
-                          },
-                        ]"
-                      ></v-text-field>
-                      <v-btn
-                        :style="`background-color:${config.mcolor}`"
-                        class="ml-2"
-                        height="25px"
-                        @click="sendEmail"
-                      >
-                        {{ $t("TaskScreen.SEND") }}
-                      </v-btn>
-                    </div>
-                  </v-card-text>
-                  <v-card-text v-if="n === 3">
+            </v-tabs>
+            <v-tabs-window v-model="tab">
+              <v-card flat>
+                <v-tabs-window-item value="1">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      justify-content: space-around;
+                      padding: 16px;
+                    "
+                  >
                     <div
                       style="
                         display: flex;
                         flex-direction: column;
                         align-items: center;
-                        gap: 10px;
-                        justify-content: space-around;
-                        padding: 16px;
+                        width: 100%;
                       "
                     >
-                      <!-- <v-icon :color="config.mfontcolor"
-                        >mdi-help-circle</v-icon
-                      > -->
                       <p
-                        :style="`color:${config.mfontcolor};font-size:16px; padding-bottom:10px;`"
+                        :style="`color:${config.mfontcolor}; font-size:16px; padding-bottom:16px;`"
                       >
-                        {{ $t("TaskScreen.LINK_TO_COPY") }}:
+                        {{ $t("TaskScreen.YOUR_INVITE_CODE") }}:
                       </p>
-                      <v-text-field
-                        solo
-                        data-test="link"
-                        id="invite-link"
-                        name="inviteLink"
-                        type="text"
-                        autocomplete="off"
-                        v-model="inviteLink"
-                        style="width: 300px"
-                        class="link"
-                        ref="inviteTextField"
-                      ></v-text-field>
+                      <p
+                        :style="`color:${config.mfontcolor};font-weight:bold;font-size:14px;padding-bottom:16px;`"
+                      >
+                        {{ inviteCode }}
+                      </p>
                       <v-btn
                         :style="`background-color:${config.mcolor}`"
                         class="ml-2"
                         height="25px"
-                        @click="copyLinkToClipboard"
+                        @click="copyCodeToClipboard"
                       >
-                        {{ $t("TaskScreen.COPY_INVITE_LINK") }}
+                        {{ $t("TaskScreen.COPY_INVITE_CODE") }}
                       </v-btn>
                     </div>
-                  </v-card-text>
-                </v-card>
-              </v-tab-item>
-            </v-tabs>
+                  </div>
+                </v-tabs-window-item>
+                <v-tabs-window-item value="2">
+                  <div
+                    :style="`color:${config.mfontcolor};display: flex;flex-direction: column;align-items: center;gap: 10px;justify-content: space-around; padding:10px;`"
+                  >
+                    <p style="font-size: 16px; padding-bottom: 16px">
+                      {{ $t("TaskScreen.SEND_INVITE_CODE_EMAIL") }}
+                    </p>
+                    <v-card
+                      :style="`padding: 10px; border: 1px solid ${config.mfontcolor}`"
+                    >
+                      <v-card-text
+                        style="font-weight: 700"
+                        v-html="email_subject"
+                      />
+                      <v-card-text v-html="email_body" />
+                    </v-card>
+                    <p style="text-align: center">
+                      {{ $t("TaskScreen.SEND_EMAIL_DESCRIPTION") }}
+                    </p>
+                    <v-text-field
+                      solo
+                      data-test="email"
+                      id="invite-email"
+                      name="inviteEmail"
+                      type="text"
+                      autocomplete="off"
+                      v-model="emailToSend"
+                      style="width: 100%"
+                      class="link"
+                      ref="inviteEmail"
+                      :placeholder="$t('TaskScreen.EMAIL_PLACEHOLDER') + '...'"
+                      :rules="[
+                        (value) => {
+                          return emailRule(value)
+                        },
+                      ]"
+                    ></v-text-field>
+                    <v-btn
+                      :style="`background-color:${config.mcolor}`"
+                      class="ml-2"
+                      height="25px"
+                      @click="sendEmail"
+                    >
+                      {{ $t("TaskScreen.SEND") }}
+                    </v-btn>
+                  </div>
+                </v-tabs-window-item>
+                <v-tabs-window-item value="3">
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      gap: 10px;
+                      justify-content: space-around;
+                      padding: 16px;
+                    "
+                  >
+                    <!-- <v-icon :color="config.mfontcolor"
+                        >mdi-help-circle</v-icon
+                      > -->
+                    <p
+                      :style="`color:${config.mfontcolor};font-size:16px; padding-bottom:10px;`"
+                    >
+                      {{ $t("TaskScreen.LINK_TO_COPY") }}:
+                    </p>
+                    <v-textarea
+                      solo
+                      data-test="link"
+                      id="invite-link"
+                      name="inviteLink"
+                      type="text"
+                      autocomplete="off"
+                      v-model="inviteLink"
+                      style="width: 100%; font-size: 12px"
+                      class="link"
+                      ref="inviteTextField"
+                    ></v-textarea>
+                    <v-btn
+                      :style="`background-color:${config.mcolor}`"
+                      class="ml-2"
+                      height="25px"
+                      @click="copyLinkToClipboard"
+                    >
+                      {{ $t("TaskScreen.COPY_INVITE_LINK") }}
+                    </v-btn>
+                  </div>
+                </v-tabs-window-item>
+              </v-card>
+            </v-tabs-window>
           </v-card>
         </template>
       </transition>
@@ -461,6 +460,10 @@ export default {
 }
 </script>
 <style scoped>
+:deep(.v-field__input) {
+  font-size: 12px !important;
+}
+
 .root {
   display: flex;
   flex-direction: column;

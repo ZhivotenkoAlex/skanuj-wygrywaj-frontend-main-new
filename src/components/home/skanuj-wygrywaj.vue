@@ -47,7 +47,6 @@
         <v-col cols="12">
           <!-- GAME RECEIPT (Krystian asked to hide this module) -->
           <v-card
-            max-width="344"
             :style="`color:${config.mfontcolor};width:100%`"
             class="mx-auto mb-5 pb-5 hidden"
           >
@@ -106,7 +105,6 @@
           <!--  GAME AWARD -->
 
           <v-card
-            max-width="344"
             :style="`color:${config.mfontcolor};width:100%;background: #ffffffb3`"
             class="mx-auto mb-5 pb-5"
             v-if="notifications > 0"
@@ -132,7 +130,7 @@
                   "
                 ></v-card-title>
 
-                <v-card-actions :style="`color:${config.mcolor}`" class="pt-5">
+                <v-card-actions :style="`color:white`" class="pt-5">
                   <v-btn
                     :style="`background-color:${config.mcolor}`"
                     class="ml-2"
@@ -160,7 +158,6 @@
           <!--    GAMIFICATION LIST-->
 
           <!-- <v-card
-            max-width="344"
             :style="`color:${config.mfontcolor};width:100%;background: #ffffffb3`"
             class="mx-auto mb-5 pb-5"
           >
@@ -200,7 +197,6 @@
             <v-card
               :key="'product' + product.id"
               class="mx-auto mb-3"
-              max-width="344"
               :style="`color:${config.mfontcolor};width:100%;background:#ffffffcc`"
               v-for="product in rewards"
             >

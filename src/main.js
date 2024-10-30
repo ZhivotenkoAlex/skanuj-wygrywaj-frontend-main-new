@@ -8,7 +8,7 @@ import { i18n } from "./plugins/i18n";
 import Vue3FormGenerator from 'vue3-form-generator';
 import '@mdi/font/css/materialdesignicons.css';
 import '@fortawesome/fontawesome-free/css/all.css';
-require('./assets/css/styles.css');
+import './assets/css/styles.css';
 import VueForm from '@vueform/vueform';
 import vueformConfig from './plugins/vueform.config.js';
 
