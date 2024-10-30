@@ -108,7 +108,7 @@ export const GamificationButtonTitles = {
     "SHARE": "Podziel się treścią",
     "PIC": "Podziel się zdjęciem",
     "TEXT": "Przeczytaj tekst",
-    "REG": "Zaproś znajomych",
+    "REG": "Udostępnij kupon",
     "PSH": "Zrób zakupy w sklepie online",
     "BILL": "Wyślij rachunek",
     "NEWS": "Zapisz się do newslettera",
