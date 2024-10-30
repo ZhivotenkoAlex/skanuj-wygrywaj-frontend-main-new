@@ -28,15 +28,13 @@
       <div v-for="rule in mandatoryrules" :key="rule.id">
         <v-list-item
           :key="rule.id"
-          @click="rule.selected = !rule.selected"
+          @click="toggleSelection(rule)"
           class="py-3 list_item"
         >
           <v-list-item-action class="item_action">
             <v-checkbox
               :color="config.mcolor"
-              :value="rule.selected"
               v-model="rule.selected"
-              @click="rule.selected = !rule.selected"
             ></v-checkbox>
           </v-list-item-action>
           <v-list-item-subtitle lines="all"
@@ -50,13 +48,12 @@
       <div v-for="rule in voluntaryrules" :key="rule.id">
         <v-list-item
           :key="rule.id"
-          @click="rule.selected = !rule.selected"
+          @click="toggleSelection(rule)"
           class="py-3 list_item"
         >
           <v-list-item-action class="item_action">
             <v-checkbox
               :color="config.mcolor"
-              :value="rule.selected"
               v-model="rule.selected"
               @click="rule.selected = !rule.selected"
             ></v-checkbox>
@@ -122,6 +119,10 @@ export default {
       loadRules()
       fetchAddress()
     })
+
+    const toggleSelection = (rule) => {
+      rule.selected = !rule.selected
+    }
 
     const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
@@ -283,13 +284,16 @@ export default {
       )
       const userResponse = await api.getUserData(token, passedCompanyId)
       const userData = userResponse.data.data
+      console.log("🚀 ~ getFormScheme ~ userData:", userData)
       let schemaData = schemaResult?.data?.data?.fields
+      console.log("🚀 ~ getFormScheme ~ schemaData:", schemaData)
       if (schemaData) {
         Object.keys(schemaData).forEach((key) => {
           if (schemaData[key].type === "date") {
             schemaData[key]["default"] = formatDate(userData[key])
           } else schemaData[key]["default"] = userData[key] ?? ""
         })
+
         schema.value = schemaData
       }
     }
@@ -312,6 +316,7 @@ export default {
       phonerule,
       niprule,
       handleSubmit,
+      toggleSelection,
     }
   },
 }
