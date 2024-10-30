@@ -128,7 +128,7 @@ export default {
         config.outercolor = data.layout_background_color_outer
         config.innercolor = data.layout_background_color_inner
         config.loginImage = data.layout_login_image
-        if (data.layout_custom_js != "") {
+        if (data.layout_custom_js != "" && data.layout_custom_js !== null) {
           var new_script = document.createElement("script")
           new_script.appendChild(data.layout_custom_js)
           document.body.appendChild(new_script)
