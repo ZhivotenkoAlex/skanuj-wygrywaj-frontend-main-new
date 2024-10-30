@@ -91,12 +91,13 @@ import companyconfig from "@/core/companyconfig"
 import alert from "@/components/shared/errorAlert.vue"
 import auth from "@/core/auth"
 import api from "@/services/fetchapi"
-
+import { useI18n } from "vue-i18n"
 export default {
   components: {
     alert,
   },
   setup() {
+    const { t } = useI18n()
     const router = useRouter()
     const address = reactive({
       name: "",
@@ -152,7 +153,7 @@ export default {
       )
 
       if (!isMandatoryTermsSelected) {
-        address.errors = this.$t("Errors.NEED_REQUIRED_TERMS_ACCEPTANCE")
+        address.errors = t("Errors.NEED_REQUIRED_TERMS_ACCEPTANCE")
         address.showerror = true
         return
       }
@@ -228,14 +229,14 @@ export default {
 
     const namerule = (value) => {
       if (!value) {
-        return this.$t("PersonalData.REQUIRED")
+        return t("PersonalData.REQUIRED")
       }
       return true
     }
 
     const surnamerule = (value) => {
       if (!value) {
-        return this.$t("PersonalData.REQUIRED")
+        return t("PersonalData.REQUIRED")
       }
       return true
     }
@@ -244,10 +245,10 @@ export default {
       const phoneNumberRegex =
         /^(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?[\d\s.-]{7,10}$/
       if (!value) {
-        return this.$t("PersonalData.REQUIRED")
+        return t("PersonalData.REQUIRED")
       }
       if (!phoneNumberRegex.test(value)) {
-        return this.$t("Errors.INVALID_PHONE")
+        return t("Errors.INVALID_PHONE")
       }
       return true
     }
@@ -255,10 +256,10 @@ export default {
     const niprule = (value) => {
       const nipRegex = /^\d{10}$/
       if (!value) {
-        return this.$t("PersonalData.REQUIRED")
+        return t("PersonalData.REQUIRED")
       }
       if (!nipRegex.test(value)) {
-        return this.$t("Errors.INVALID_NIP")
+        return t("Errors.INVALID_NIP")
       }
       return true
     }
