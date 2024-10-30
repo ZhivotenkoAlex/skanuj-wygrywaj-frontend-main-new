@@ -210,3 +210,7 @@ export default {
   },
 }
 </script>
+
+<style>
+@import "./../node_modules/@vueform/vueform/dist/vueform.css";
+</style>

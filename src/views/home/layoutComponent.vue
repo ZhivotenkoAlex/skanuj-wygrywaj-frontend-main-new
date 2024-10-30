@@ -380,7 +380,7 @@ export default {
   min-height: calc(let(--vh, 1vh) * 100);
 }
 
-::v-deep .sidebar-title > .v-list-item__content {
+:deep(.sidebar-title > .v-list-item__content) {
   display: flex !important;
   flex-direction: row;
   align-items: center;

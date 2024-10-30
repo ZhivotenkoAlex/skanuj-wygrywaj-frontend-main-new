@@ -9,21 +9,8 @@
       <v-img :src="config.shortlogo" max-height="50px" contain></v-img>
     </v-card>
     <v-container>
-      <v-card flat style="background-color: #fff0">
-        <div class="panel-body">
-          <form @submit.prevent="doAccept">
-            <vue-form-generator
-              :schema="schema"
-              :model="model"
-              :options="formOptions"
-              style="margin: 10px"
-              @submit="doAccept"
-              @validated="onValidated"
-              ref="form"
-            >
-            </vue-form-generator>
-          </form>
-        </div>
+      <v-card flat style="background-color: #fff0; padding-top: 10px">
+        <Vueform ref="vueForm" :schema="schema" />
       </v-card>
     </v-container>
 
@@ -80,7 +67,7 @@
         </v-list-item>
       </div>
     </v-list>
-    <v-flex class="justify-center mx-3">
+    <v-card class="justify-center mx-3">
       <v-alert v-if="showSuccess" color="green" type="success" dismissible>
         {{ $t("PersonalData.SUCCESS") }}
       </v-alert>
@@ -89,10 +76,10 @@
         block
         :color="config.mcolor"
         :style="`color:#fff !important`"
-        @click="doAccept"
+        @click="handleSubmit"
         v-text="$t('LoginScreen.ACCEPT_BTN')"
       ></v-btn>
-    </v-flex>
+    </v-card>
   </v-card>
 </template>
 
@@ -104,12 +91,10 @@ import companyconfig from "@/core/companyconfig"
 import alert from "@/components/shared/errorAlert.vue"
 import auth from "@/core/auth"
 import api from "@/services/fetchapi"
-import VueFormGenerator from "vue-form-generator"
 
 export default {
   components: {
     alert,
-    VueFormGenerator,
   },
   setup() {
     const router = useRouter()
@@ -127,12 +112,8 @@ export default {
     const config = reactive({})
     const model = reactive({})
     const schema = ref({})
-    const formOptions = reactive({
-      validateAfterChanged: true,
-      validateBeforeSubmit: true,
-      // submitHandler: this.handleSubmit,
-      validationErrorClass: "new_error",
-    })
+    const formData = ref()
+    const vueForm = ref()
 
     onMounted(() => {
       getFormScheme()
@@ -150,30 +131,20 @@ export default {
       }
     }
 
-    const getModel = async () => {
-      const token = auth.getAccessToken()
-      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      const modelOrderObject = {}
-
-      const result = await api.getUserData(token, passedCompanyId)
-      let response = result.data
-      if (response.data) {
-        let data = response.data
-        schema.value.fields.forEach((field) => {
-          const value =
-            !data[field.model] && field.type == "checkbox"
-              ? false
-              : data[field.model]
-          model[field.model] = value
-        })
+    const handleSubmit = async () => {
+      await vueForm.value.validate()
+      const isValid = !vueForm.value.invalid
+      if (isValid) {
+        onSubmit(vueForm.value.data)
+      } else {
+        console.log("Form validation failed")
       }
-
-      return modelOrderObject
     }
 
-    const doAccept = () => {
-      const isValid = this.$refs.form.validate()
-      const formData = model
+    const onSubmit = async (data) => {
+      await vueForm.value.validate()
+      const isValid = !vueForm.value.invalid
+
       comprules.value = [...mandatoryrules.value, ...voluntaryrules.value]
       let items = comprules.value.filter((a) => a.selected == true)
       const isMandatoryTermsSelected = mandatoryrules.value.every(
@@ -191,7 +162,7 @@ export default {
         let passedCompanyId = companyconfig.getCompanyIdfromUrl()
         let token = auth.getAccessToken()
         let lang = auth.getAppLanguage()
-        api.saveUserdataForRules(token, formData)
+        api.saveUserdataForRules(token, data)
         api
           .agreeCompanyRules(token, passedCompanyId, lang, ids)
           .then(() => {
@@ -297,15 +268,28 @@ export default {
       address.showerror = false
     }
 
+    const formatDate = (timestamp) => {
+      const date = new Date(timestamp)
+      return date.toISOString().split("T")[0]
+    }
+
     const getFormScheme = async () => {
       const passedCompanyId = companyconfig.getCompanyIdfromUrl()
       const token = auth.getAccessToken()
-      const result = await api.getCompanyRulesFormScheme(token, passedCompanyId)
-      let response = result.data
-      if (response.data) {
-        let data = response.data
-        schema.value = data
-        getModel()
+      const schemaResult = await api.getCompanyRulesFormScheme(
+        token,
+        passedCompanyId
+      )
+      const userResponse = await api.getUserData(token, passedCompanyId)
+      const userData = userResponse.data.data
+      let schemaData = schemaResult?.data?.data?.fields
+      if (schemaData) {
+        Object.keys(schemaData).forEach((key) => {
+          if (schemaData[key].type === "date") {
+            schemaData[key]["default"] = formatDate(userData[key])
+          } else schemaData[key]["default"] = userData[key] ?? ""
+        })
+        schema.value = schemaData
       }
     }
 
@@ -318,13 +302,15 @@ export default {
       config,
       model,
       schema,
-      formOptions,
-      doAccept,
+      formData,
+      vueForm,
+      onSubmit,
       removeErrors,
       namerule,
       surnamerule,
       phonerule,
       niprule,
+      handleSubmit,
     }
   },
 }
@@ -380,5 +366,20 @@ fieldset {
   border-color: #ecc2c2 !important;
   border: 1px solid #ecc2c2;
   background-color: #ecc2c2;
+}
+.v-list-item__content {
+  display: flex;
+}
+.v-list-item--one-line .v-list-item-subtitle {
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+}
+
+.v-selection-control {
+  align-items: baseline !important;
+}
+
+.vf-errors {
+  display: none;
 }
 </style>
