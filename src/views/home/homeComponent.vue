@@ -30,7 +30,14 @@
 </template>
 
 <script>
-import { ref, onMounted, defineComponent, computed } from "vue"
+import {
+  ref,
+  onMounted,
+  defineComponent,
+  shallowRef,
+  // computed,
+  defineAsyncComponent,
+} from "vue"
 import companyconfig from "@/core/companyconfig"
 //import incentives from "@/components/home/incentivesComponent";
 //import products from "@/components/home/productsComponent";
@@ -54,6 +61,7 @@ export default defineComponent({
     const tab = ref("tab1")
     const config = ref({})
     const fullyLoaded = ref(false)
+    const dynamicComponent = shallowRef(null)
     let styleTag
 
     const setupLayout = () => {
@@ -93,12 +101,14 @@ export default defineComponent({
       }
     })
 
-    const dynamicComponent = computed(() => {
-      if (config.value.index_component == null) {
-        return {}
-      }
-      return () =>
-        import(`@/components/home/${config.value.index_component}.vue`)
+    dynamicComponent.value = defineAsyncComponent({
+      loadingComponent: () => import("@/components/shared/loaderComponent.vue"),
+      loader: () => {
+        return import(`@/components/home/${config.value.index_component}.vue`)
+      },
+      errorComponent: () => import("@/components/shared/notFound.vue"),
+      delay: 200,
+      timeout: 3000,
     })
 
     return {

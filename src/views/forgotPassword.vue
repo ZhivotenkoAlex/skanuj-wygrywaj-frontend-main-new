@@ -119,7 +119,6 @@
                     </v-col>
                   </v-row>
                   <v-card-actions style="justify-content: center">
-                    <!-- <v-flex class="text-center"> -->
                     <v-btn
                       block
                       @click="doChangePassword"
