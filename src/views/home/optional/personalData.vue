@@ -45,7 +45,7 @@
                 :placeholder="$t('PersonalData.NAME')"
                 class="account-input"
                 name="name"
-                prepend-icon="person"
+                prepend-icon="mdi-account"
                 type="text"
                 v-model="address.name"
                 :rules="[
@@ -61,7 +61,7 @@
                 :placeholder="$t('PersonalData.LAST_NAME')"
                 class="account-input"
                 name="surname"
-                prepend-icon="person"
+                prepend-icon="mdi-account"
                 type="text"
                 v-model="address.surname"
                 :rules="[
@@ -77,7 +77,7 @@
                 :placeholder="$t('PersonalData.PHONE')"
                 class="account-input"
                 name="phone"
-                prepend-icon="phone"
+                prepend-icon="mdi-phone"
                 type="text"
                 v-model="address.phone"
                 :rules="[
@@ -93,7 +93,7 @@
                 :placeholder="'E-mail'"
                 class="account-input"
                 name="contact_email"
-                prepend-icon="email"
+                prepend-icon="mdi-email"
                 type="text"
                 v-model="address.contact_email"
                 :rules="[
@@ -109,7 +109,7 @@
                 :placeholder="$t('PersonalData.COUNTRY')"
                 class="account-input"
                 name="contact_country"
-                prepend-icon="home"
+                prepend-icon="mdi-map-marker"
                 type="text"
                 v-model="address.country"
               ></v-text-field>
@@ -120,7 +120,7 @@
                 :placeholder="$t('PersonalData.CITY')"
                 class="account-input"
                 name="contact_city"
-                prepend-icon="home"
+                prepend-icon="mdi-city"
                 type="text"
                 v-model="address.city"
               ></v-text-field>
@@ -131,7 +131,7 @@
                 :placeholder="$t('PersonalData.ZIP_CODE')"
                 class="account-input"
                 name="contact_zip"
-                prepend-icon="home"
+                prepend-icon="mdi-postage-stamp"
                 type="text"
                 v-model="address.zip_code"
               ></v-text-field>
@@ -143,7 +143,7 @@
                 :placeholder="$t('PersonalData.STREET')"
                 class="account-input"
                 name="contact_street_address"
-                prepend-icon="home"
+                prepend-icon="mdi-home-city"
                 type="text"
                 v-model="address.street_address"
               ></v-text-field>
@@ -153,8 +153,8 @@
                 dense
                 :placeholder="$t('PersonalData.HOUSE_NUMBER')"
                 class="account-input"
-                name="contact_street_number"
-                prepend-icon="home"
+                name="s"
+                prepend-icon="mdi-home"
                 type="text"
                 v-model="address.street_number"
               ></v-text-field>
@@ -165,7 +165,7 @@
                 :placeholder="$t('PersonalData.APARTMENT_NUMBER')"
                 class="account-input"
                 name="contact_apartment_number"
-                prepend-icon="home"
+                prepend-icon="mdi-door"
                 type="text"
                 v-model="address.apartment_number"
               ></v-text-field>
@@ -446,7 +446,13 @@ button.receipt-action-btn {
   display: flex;
 }
 
-.v-text-field.v-input--dense {
+.v-input--dense {
   margin-bottom: 5px;
+  min-height: 35px !important;
 }
+/* .v-field__input {
+  min-height: 35px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+} */
 </style>

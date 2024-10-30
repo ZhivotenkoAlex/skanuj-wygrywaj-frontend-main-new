@@ -90,68 +90,55 @@
 </template>
 
 <script>
-import { NO_HISTORY, NO_COMPANY_FOUND, GamificationIcons } from "@/appConstants"
+import { ref, onMounted } from "vue"
+import { GamificationIcons } from "@/appConstants"
 import companyconfig from "@/core/companyconfig"
 import auth from "@/core/auth"
 import api from "@/services/fetchapi"
+import { useI18n } from "vue-i18n"
 
 export default {
-  data() {
-    return {
-      history: [],
-      hasMore: false,
-      limit: 10,
-      offset: 0,
-      config: {},
-      status_map: [],
-      bought_info_statuses: ["W", "S", "Z"],
-      companyName: "",
-    }
-  },
-  created() {
-    this.setupLayout()
-    this.loadHistory()
-  },
-  methods: {
-    setupLayout() {
+  setup() {
+    const { t } = useI18n()
+    const history = ref([])
+    const hasMore = ref(false)
+    const limit = ref(10)
+    const offset = ref(0)
+    const config = ref({})
+    const status_map = ref([])
+    const bought_info_statuses = ref(["W", "S", "Z"])
+    const companyName = ref("")
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
+        config.value.mcolor = data.main_color
+        config.value.mfontcolor = data.main_font_color
       }
-    },
-    loadHistory() {
+    }
+
+    const loadHistory = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.companyName = passedCompanyId
+      companyName.value = passedCompanyId
       let token = auth.getAccessToken()
-      let instance = this
       api
         .getHistory(token, passedCompanyId)
         .then((result) => {
           let response = result.data
-          console.log("🚀 ~ .then ~ response:", response.data)
-
           response.data.forEach((item) => {
-            instance.history.push(item)
+            history.value.push(item)
           })
 
-          instance.status_map = response.status_map
-          instance.hasMore = response.hasMore
-          instance.offset += instance.limit
+          status_map.value = response.status_map
+          hasMore.value = response.hasMore
+          offset.value += limit.value
         })
         .catch((err) => {
           console.log(err)
-
-          this.historyExists = false
-          let errmsg = err.data.message
-          if (errmsg === NO_HISTORY) {
-            console.log(err)
-          } else if (errmsg === NO_COMPANY_FOUND) {
-            console.log(err)
-          }
         })
-    },
-    getStatusColor(receipt) {
+    }
+
+    const getStatusColor = (receipt) => {
       let $color = "#aba204"
       switch (receipt.is_success) {
         case "-1":
@@ -170,28 +157,30 @@ export default {
           break
       }
       return $color
-    },
-    getStatusText(receipt) {
+    }
+
+    const getStatusText = (receipt) => {
       let $status = ""
       switch (receipt.is_success) {
         case "-1":
-          $status = this.$t("History.STATUS_REJECTED")
+          $status = t("History.STATUS_REJECTED")
           break
         case "0":
           if (parseInt(receipt.marked_by_user_to_recheck) > 0) {
-            $status = this.$t("History.STATUS_ON_VERIFICATION")
+            $status = t("History.STATUS_ON_VERIFICATION")
           } else {
-            $status = this.$t("History.STATUS_REJECTED")
+            $status = t("History.STATUS_REJECTED")
           }
           break
         case "2":
         case "1":
-          $status = this.$t("History.STATUS_ACCEPTED")
+          $status = t("History.STATUS_ACCEPTED")
           break
       }
       return $status
-    },
-    getPicture(purchase) {
+    }
+
+    const getPicture = (purchase) => {
       let picture = ""
       if (purchase.type === "S") {
         picture = GamificationIcons["SURV"]
@@ -200,56 +189,53 @@ export default {
         picture = purchase.product.picture
       }
       return picture
-    },
-    getDescription(receipt) {
+    }
+
+    const getDescription = (receipt) => {
       let $status = ""
       switch (receipt.type) {
         case "BH":
-          $status = `${this.$t("RewardsScreen.ORDER")} ${receipt.id} ${this.$t(
+          $status = `${t("RewardsScreen.ORDER")} ${receipt.id} ${t(
             "RewardsScreen.WAS_FILLED_ABOUT"
-          )} ${receipt.date} Company - ${this.companyName} ${this.getPurchaseBy(
+          )} ${receipt.date} Company - ${companyName.value} ${getPurchaseBy(
             receipt
           )}`
           break
         case "S":
-          $status = `${this.$t("RewardsScreen.SURVEY_SUCCESS")} ${
-            receipt.date
-          } ${this.$t("RewardsScreen.COMPANY")} - ${
-            this.companyName
-          }  ${this.getPurchaseBy(receipt)}`
+          $status = `${t("RewardsScreen.SURVEY_SUCCESS")} ${receipt.date} ${t(
+            "RewardsScreen.COMPANY"
+          )} - ${companyName.value}  ${getPurchaseBy(receipt)}`
           break
         case "GW":
-          $status = `${this.$t("RewardsScreen.GAME_WON")} ${
-            receipt.date
-          } ${this.$t("RewardsScreen.COMPANY")} - ${
-            this.companyName
-          }  ${this.getPurchaseBy(receipt)}`
+          $status = `${t("RewardsScreen.GAME_WON")} ${receipt.date} ${t(
+            "RewardsScreen.COMPANY"
+          )} - ${companyName.value}  ${getPurchaseBy(receipt)}`
           break
       }
       return $status
-    },
-    getPurchaseBy(purchase) {
-      console.log("🚀 ~ getPurchaseBy ~ purchase:", purchase)
+    }
+
+    const getPurchaseBy = (purchase) => {
       let r = ""
-      console.log("🚀 ~ getPurchaseBy ~ purchase.type:", purchase.type)
       if (purchase.type === "BH") {
         r =
-          this.$t("RewardsScreen.WORTH") +
+          t("RewardsScreen.WORTH") +
           " " +
           purchase.points +
           " " +
-          this.lang_points(purchase.points)
+          lang_points(purchase.points)
       } else {
         r =
-          this.$t("RewardsScreen.AND_RECEIVED") +
+          t("RewardsScreen.AND_RECEIVED") +
           " " +
           purchase.points +
           " " +
-          this.lang_points(purchase.points)
+          lang_points(purchase.points)
       }
       return r
-    },
-    lang_points(num, base, suffix_1, suffix_2, suffix_5) {
+    }
+
+    const lang_points = (num, base, suffix_1, suffix_2, suffix_5) => {
       let lang = auth.getAppLanguage()
       if (lang === "pl") {
         if (typeof base === "undefined") base = "punkt"
@@ -266,20 +252,47 @@ export default {
           return base + suffix_2
         else return base + suffix_5
       } else {
-        base = this.$t("AppScreen.POINT")
+        base = t("AppScreen.POINT")
         if (num === 1) return base
         else return base + "s" // warning: there might be exceptions to this rule
       }
-    },
-    navigateapply(id) {
+    }
+
+    const navigateapply = (id) => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       this.$router.push({
         name: "applyreservation",
         params: { id: id },
         query: { company_name: passedCompanyId },
       })
-    },
+    }
+
+    onMounted(() => {
+      setupLayout()
+      loadHistory()
+    })
+
+    return {
+      history,
+      hasMore,
+      limit,
+      offset,
+      config,
+      status_map,
+      bought_info_statuses,
+      companyName,
+      setupLayout,
+      loadHistory,
+      getStatusColor,
+      getStatusText,
+      getPicture,
+      getDescription,
+      getPurchaseBy,
+      lang_points,
+      navigateapply,
+    }
   },
 }
 </script>
+
 <style></style>

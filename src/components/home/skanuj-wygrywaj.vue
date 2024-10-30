@@ -657,7 +657,7 @@ export default {
 }
 
 #close-widget-btn i {
-  color: #000 !important;
+  color: #000;
 }
 
 main.home {

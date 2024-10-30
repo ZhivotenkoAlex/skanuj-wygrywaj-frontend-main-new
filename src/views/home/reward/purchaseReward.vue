@@ -22,7 +22,7 @@
                 dense
                 :placeholder="`${$t('PersonalData.NAME_AND_LAST_NAME')}`"
                 name="full_name"
-                prepend-icon="person"
+                prepend-icon="mdi-account"
                 type="text"
                 autofocus
                 v-model="address.full_name"

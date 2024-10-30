@@ -1,147 +1,110 @@
 <template>
-  <v-card flat tile :style="`background:#fff0;`">
-    <v-toolbar
-      dense
-      :color="config.mcolor"
-      :style="`color:${config.mfontcolor} !important`"
-      flat
-    >
-      <!-- <v-btn
-        icon
-        class="border0px"
-        @click="navigatehome"
-        :style="`color:${config.mfontcolor} !important`"
-      >
-        <v-icon>mdi-arrow-left</v-icon>
-      </v-btn> -->
+  <v-card flat tile :style="{ background: '#fff0' }">
+    <v-toolbar flat dense :color="config.mcolor">
       <v-toolbar-title
         v-text="$t('History.HISTORY')"
         style="color: white"
       ></v-toolbar-title>
-      <!-- <v-spacer></v-spacer>
-      <v-btn
-        icon
-        class="border0px"
-        @click="navigatehome"
-        :style="`color:${config.mfontcolor} !important`"
-      >
-        <v-icon>mdi-home-circle-outline</v-icon>
-      </v-btn> -->
     </v-toolbar>
 
     <v-tabs
       v-model="tab"
       fixed-tabs
       color="blue-grey lighten-3"
-      :style="`background-color:${config.innercolor} !important`"
+      :style="{ backgroundColor: `${config.innercolor} !important` }"
     >
-      <v-tabs-slider></v-tabs-slider>
       <v-tab
-        href="#tab-1"
-        :style="`background-color:${config.innercolor} !important;color:white`"
+        :style="{
+          backgroundColor: `${config.innercolor} !important`,
+          color: 'white',
+        }"
+        value="receipts"
       >
         {{ $t("History.RECEIPTS") }}
         <v-icon>mdi-receipt-text-check</v-icon>
       </v-tab>
 
       <v-tab
-        href="#tab-2"
-        :style="`background-color:${config.innercolor} !important;color:white`"
+        :style="{
+          backgroundColor: `${config.innercolor} !important`,
+          color: 'white',
+        }"
+        value="awards"
       >
         {{ $t("History.AWARDS") }}
         <v-icon>mdi-gift</v-icon>
       </v-tab>
-      <!-- <v-tab href="#tab-3">
-        Games
-        <v-icon>mdi-gift</v-icon>
-      </v-tab> -->
     </v-tabs>
 
-    <v-tabs-items v-model="tab" style="background-color: #fff0 !important">
-      <v-tab-item :key="1" :value="'tab-1'">
-        <receipts></receipts>
-      </v-tab-item>
-      <v-tab-item :key="2" :value="'tab-2'">
-        <purchases></purchases>
-      </v-tab-item>
-      <!-- <v-tab-item :key="3" :value="'tab-3'">
-        <games></games>
-      </v-tab-item> -->
-    </v-tabs-items>
+    <v-window v-model="tab">
+      <v-window-item value="receipts"> <receipts /> </v-window-item>
+      <v-window-item value="awards"> <purchases /> </v-window-item>
+    </v-window>
   </v-card>
 </template>
+
 <script>
+import { ref, onMounted, reactive } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import { NO_HISTORY, NO_COMPANY_FOUND } from "@/appConstants"
 import companyconfig from "@/core/companyconfig"
 import auth from "@/core/auth"
 import api from "@/services/fetchapi"
 import receipts from "../components/history/receiptsComponent.vue"
-// import games from "../components/history/gamesComponent"
 import purchases from "../components/history/purchasesComponent"
 
 export default {
-  data() {
-    return {
-      default_tab: "tab-1",
-      history: [],
-      config: {},
-      tab: "tab-1",
-      colors: [
-        "cyan",
-        "green",
-        "purple",
-        "amber",
-        "pink",
-        "teal",
-        "indigo",
-        "light-green",
-        "light-blue",
-        "blue-grey",
-        "brown",
-      ],
-      historyExists: false,
-    }
-  },
   components: {
     receipts,
-    // games,
     purchases,
   },
-  mounted() {
-    this.setupLayout()
-    this.loadHistory()
-    this.tab = this.$route.params.tab || this.default_tab
-  },
-  methods: {
-    /**
-     * Set the Intial color configuration for page
-     */
-    setupLayout() {
+  setup() {
+    const route = useRoute()
+    const router = useRouter()
+    const default_tab = "receipts"
+    const history = ref([])
+    const config = reactive({})
+    const tab = ref("awards")
+    const colors = [
+      "cyan",
+      "green",
+      "purple",
+      "amber",
+      "pink",
+      "teal",
+      "indigo",
+      "light-green",
+      "light-blue",
+      "blue-grey",
+      "brown",
+    ]
+    const historyExists = ref(false)
+
+    const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color)
-        this.$set(this.config, "mfontcolor", data.main_font_color)
-        this.$set(this.config, "innercolor", data.layout_background_color_inner)
-        this.$set(this.config, "outercolor", data.layout_background_color_outer)
+        config.mcolor = data.main_color
+        config.mfontcolor = data.main_font_color
+        config.innercolor = data.layout_background_color_inner
+        config.outercolor = data.layout_background_color_outer
       }
-    },
-    /** Navigate to previous url */
-    navigate() {
-      this.$router.go(-1)
-    },
-    /** Navigate to home page */
-    navigatehome() {
+    }
+
+    const navigate = () => {
+      router.go(-1)
+    }
+
+    const navigateHome = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      this.$router.push({
+      router.push({
         name: "home",
         query: { company_name: passedCompanyId },
       })
-    },
-    /** Load the user entire history */
-    loadHistory() {
+    }
+
+    const loadHistory = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
-      //let lang = this.$i18n.locale;
       api
         .getHistory(token, passedCompanyId)
         .then((result) => {
@@ -151,36 +114,31 @@ export default {
           if (items.length != 0) {
             items.forEach((item) => {
               let obj = {}
-              if (item.points < 0) {
-                obj.mcolor = "red"
-              } else {
-                obj.mcolor = "green"
-              }
+              obj.mcolor = item.points < 0 ? "red" : "green"
               obj.points = item.points + " " + this.$t("AppScreen.POINTS")
-              obj.type = this.getType(item.type)
+              obj.type = getType(item.type)
               obj.date = item.date
-              obj.color =
-                this.colors[Math.floor(Math.random() * this.colors.length)]
+              obj.color = colors[Math.floor(Math.random() * colors.length)]
               data.push(obj)
             })
-            this.history = data
-            this.historyExists = true
+            history.value = data
+            historyExists.value = true
           } else {
-            this.historyExists = false
+            historyExists.value = false
           }
         })
         .catch((err) => {
-          this.historyExists = false
-          let errmsg = err.data.message
+          historyExists.value = false
+          let errmsg = err.data?.message
           if (errmsg === NO_HISTORY) {
             console.log(err)
           } else if (errmsg === NO_COMPANY_FOUND) {
             console.log(err)
           }
         })
-    },
-    /** Get the type of history information which are displayed */
-    getType(type) {
+    }
+
+    const getType = (type) => {
       let op = ""
       switch (type) {
         case "S":
@@ -200,45 +158,27 @@ export default {
           break
       }
       return op
-    },
+    }
+
+    onMounted(() => {
+      setupLayout()
+      loadHistory()
+      tab.value = route.query.tab || default_tab
+    })
+
+    return {
+      default_tab,
+      history,
+      config,
+      tab,
+      colors,
+      historyExists,
+      setupLayout,
+      navigate,
+      navigateHome,
+      loadHistory,
+      getType,
+    }
   },
 }
-
-//  S = survey answered
-//             SV = survey viewed
-//             BAR = barcode scanned
-//             RRU = Registration with invitation code
-//             BAP = Bought A Price
 </script>
-
-<!-- DEFAULT 'BH' COMMENT 
-  'LP = Link Posted, 
-  LUV = Link Unique View, 
-  CE = Contest Entry, 
-  CD = Contest Daily Win, 
-  CGV = Contest Got Vote , 
-  CAV = Contest Add Vote, 
-  RE = Registration Entry, 
-  RRU = Registration of Reccomended User, 
-  RRC = Registration of Reccomented Company, 
-  PB = Prestashop Buy, 
-  BB = Bill Buy, 
-  BBB - Bill Buy Bonus, 
-  BH = By Hand, 
-  BAP = Bought A Price, 
-  UP = Update, 
-  S = Survey answered, 
-  SV = Survey Viewed, 
-  PS = Post Shares, 
-  PL = Post Likes, 
-  PC = Post Comments, 
-  POP = Popup Viewed, 
-  PROF = Profile filled in 
-  GP = Game Played,
-  GW = Game Won,
-  RRP = Recomended Registration Partial, 
-  BAR = Barcode scanned 
-  CARD = card registered, 
-  IMG = Image sent, 
-  NTF = registered for notifications',
-  -->

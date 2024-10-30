@@ -127,7 +127,7 @@ export default {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       this.$router.push({
         name: "personalhistory",
-        params: { tab: "tab-2" },
+        params: { tab: "awards" },
         query: { company_name: passedCompanyId },
       })
     },

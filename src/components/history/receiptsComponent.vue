@@ -35,10 +35,7 @@
                 >:
               </div>
 
-              <div
-                class="ms-4"
-                v-bind:style="{ color: getStatusColor(receipt) }"
-              >
+              <div class="ms-4" :style="{ color: getStatusColor(receipt) }">
                 {{ getStatusText(receipt) }}
               </div>
             </v-row>
@@ -59,96 +56,96 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue"
 import { NO_HISTORY, NO_COMPANY_FOUND } from "@/appConstants"
 import companyconfig from "@/core/companyconfig"
 import auth from "@/core/auth"
 import api from "@/services/fetchapi"
 
 export default {
-  data() {
-    return {
-      history: [],
-      hasMore: false,
-      limit: 10,
-      offset: 0,
-    }
-  },
-  created() {
-    this.loadHistory()
-  },
-  methods: {
-    loadHistory() {
+  setup() {
+    const history = ref([])
+    const hasMore = ref(false)
+    const limit = ref(10)
+    const offset = ref(0)
+
+    const loadHistory = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let token = auth.getAccessToken()
-      let instance = this
+
       api
-        .getReceiptsHistory(
-          token,
-          passedCompanyId,
-          instance.limit,
-          instance.offset
-        )
+        .getReceiptsHistory(token, passedCompanyId, limit.value, offset.value)
         .then((result) => {
           let response = result.data
 
           response.receipts.forEach((item) => {
-            instance.history.push(item)
+            history.value.push(item)
           })
 
-          instance.hasMore = response.hasMore
-          instance.offset += instance.limit
+          hasMore.value = response.hasMore
+          offset.value += limit.value
         })
         .catch((err) => {
-          this.historyExists = false
           let errmsg = err.data.message
-          if (errmsg === NO_HISTORY) {
-            console.log(err)
-          } else if (errmsg === NO_COMPANY_FOUND) {
-            console.log(err)
+          if (errmsg === NO_HISTORY || errmsg === NO_COMPANY_FOUND) {
+            console.log(err.data.message)
           }
         })
-    },
-    getStatusColor(receipt) {
-      let $color = "#aba204"
+    }
+
+    const getStatusColor = (receipt) => {
+      let color = "#aba204"
       switch (receipt.is_success) {
         case "-1":
-          $color = "#f44336"
+          color = "#f44336"
           break
         case "0":
-          if (parseInt(receipt.marked_by_user_to_recheck) > 0) {
-            $color = "#aba204"
-          } else {
-            $color = "#f44336"
-          }
+          color =
+            parseInt(receipt.marked_by_user_to_recheck) > 0
+              ? "#aba204"
+              : "#f44336"
           break
         case "2":
         case "1":
-          $color = "#00d415"
+          color = "#00d415"
           break
       }
-      return $color
-    },
-    getStatusText(receipt) {
-      let $status = ""
+      return color
+    }
+
+    const getStatusText = (receipt) => {
+      let status = ""
       switch (receipt.is_success) {
         case "-1":
-          $status = this.$t("History.STATUS_REJECTED")
+          status = this.$t("History.STATUS_REJECTED")
           break
         case "0":
-          if (parseInt(receipt.marked_by_user_to_recheck) > 0) {
-            $status = this.$t("History.STATUS_ON_VERIFICATION")
-          } else {
-            $status = this.$t("History.STATUS_REJECTED")
-          }
+          status =
+            parseInt(receipt.marked_by_user_to_recheck) > 0
+              ? this.$t("History.STATUS_ON_VERIFICATION")
+              : this.$t("History.STATUS_REJECTED")
           break
         case "2":
         case "1":
-          $status = this.$t("History.STATUS_ACCEPTED")
+          status = this.$t("History.STATUS_ACCEPTED")
           break
       }
-      return $status
-    },
+      return status
+    }
+
+    onMounted(() => {
+      loadHistory()
+    })
+
+    return {
+      history,
+      hasMore,
+      loadHistory,
+      getStatusColor,
+      getStatusText,
+    }
   },
 }
 </script>
+
 <style></style>

@@ -27,7 +27,7 @@
       @click="closeWidget()"
       v-if="config.layout_has_close"
     >
-      <v-icon style="color: #fff">mdi-close</v-icon>
+      <v-icon>mdi-close</v-icon>
     </span>
     <v-navigation-drawer
       v-model="drawer"
@@ -234,7 +234,7 @@ export default {
 
       router.push({
         name: "personalhistory",
-        query: { company_name: passedCompanyId },
+        query: { company_name: passedCompanyId, tab: "awards" },
       })
       drawer.value = false
     }
