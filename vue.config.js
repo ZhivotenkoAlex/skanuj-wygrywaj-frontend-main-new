@@ -21,15 +21,10 @@ module.exports = defineConfig({
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
-        // Remove the vue compat alias if you're fully migrating to Vue 3
-        // 'vue': '@vue/compat'
       }
     }
   },
   chainWebpack: config => {
-    // Remove compat mode configuration if you're fully migrating to Vue 3
-    // config.resolve.alias.set('vue', '@vue/compat')
-
     config.module
       .rule('vue')
       .use('vue-loader')
@@ -38,10 +33,6 @@ module.exports = defineConfig({
           ...options,
           compilerOptions: {
             isCustomElement: tag => tag.startsWith('custom-'),
-            // Remove compatConfig if you're fully migrating to Vue 3
-            // compatConfig: {
-            //   MODE: 2
-            // }
           }
         }
       })

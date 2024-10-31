@@ -5,7 +5,11 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "npm run build && firebase deploy --only hosting:skanuj",
+    "buildprod": "vue-cli-service build --mode production",
+    "builstaging": "vue-cli-service build --mode staging",
+    "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/undefined/**/*.json'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
