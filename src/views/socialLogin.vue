@@ -1175,6 +1175,14 @@ function checkSafariBrowser() {
   margin: auto;
 }
 
+/* .condition {
+  display: inline-flex !important;
+} */
+
+.v-label {
+  opacity: 1 !important;
+}
+
 @media (min-width: 720px) {
   #ti-remote-video-wrapper video {
     transform: none !important;

@@ -193,7 +193,8 @@
           block
           :loading="address.loading"
           :disabled="address.loading"
-          color="primary"
+          :color="config.pcolor"
+          :style="`color:white !important;background:${config.mcolor}`"
           @click="saveData"
           v-text="$t('PersonalData.SAVE')"
         ></v-btn>
@@ -425,14 +426,14 @@ export default {
   font-size: 12px;
 }
 
-.v-label {
+/* .v-label {
   display: none;
-}
+} */
 
-.v-text-field > .v-input__control > .v-input__slot:after,
+/* .v-text-field > .v-input__control > .v-input__slot:after,
 .theme--light.v-text-field > .v-input__control > .v-input__slot:before {
   display: none;
-}
+} */
 
 button.receipt-action-btn {
   display: none !important;
