@@ -234,7 +234,7 @@ export default {
 
       router.push({
         name: "personalhistory",
-        query: { company_name: passedCompanyId, tab: "awards" },
+        query: { company_name: passedCompanyId },
       })
       drawer.value = false
     }

@@ -450,9 +450,13 @@ button.receipt-action-btn {
   margin-bottom: 5px;
   min-height: 35px !important;
 }
-/* .v-field__input {
-  min-height: 35px !important;
+.account-input .v-field__input {
+  min-height: 20px !important;
   padding-top: 5px !important;
   padding-bottom: 5px !important;
-} */
+}
+
+.v-selection-control .v-label {
+  text-align: left;
+}
 </style>
