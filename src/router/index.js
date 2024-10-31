@@ -31,6 +31,7 @@ import purchaseresult from "@/views/home/reward/purchaseResult";
 import applyreservation from "@/views/home/reward/applyReservation";
 import reservationresult from "@/views/home/reward/reservationResult";
 import coupons from "@/views/home/coupons/couponsComponent";
+import couponContent from "@/views/home/coupons/couponContent";
 import { hasRules } from "@/helpers/hasRules";
 
 const routes = [
@@ -177,6 +178,11 @@ const routes = [
                 path: "/coupons",
                 name: "coupons",
                 component: coupons
+            },
+            {
+                path: "/coupons/:id",
+                name: "couponContent",
+                component: couponContent
             }
         ],
         meta: {

@@ -43,7 +43,14 @@
                 class="tabs"
                 value="1"
               >
-                <div style="display: flex; flex-direction: column; gap: 5px">
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    align-items: center;
+                  "
+                >
                   <v-icon size="15px" color="white">mdi-trophy</v-icon>
                   <span class="tab_title">{{ $t("AppScreen.WHAT_GAIN") }}</span>
                 </div>
