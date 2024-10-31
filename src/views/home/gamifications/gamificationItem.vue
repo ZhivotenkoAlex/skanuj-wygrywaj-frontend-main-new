@@ -356,7 +356,7 @@ export default {
     }
 
     const inviteFiend = () => {
-      console.log("inviteFiend")
+      console.info("inviteFiend")
     }
 
     const langPoints = (num) => {
@@ -414,7 +414,6 @@ export default {
           let response = result.data
           if (response) {
             inviteCode.value = response.inviteCode
-            console.log(response.inviteCode)
             // showInvite.value = true;
           }
         })
@@ -422,7 +421,7 @@ export default {
           let errmsg = err.data.message
           // showInvite.value = false;
           if (errmsg === "NO_INVITE_CODE") {
-            console.log(err)
+            console.error(err)
           }
         })
     }

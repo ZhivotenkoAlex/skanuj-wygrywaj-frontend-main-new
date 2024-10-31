@@ -57,18 +57,18 @@
 
       <v-divider></v-divider>
       <v-list nav dense v-model:selected="selectedItem">
-        <v-list-item value="home">
-          <v-list-item-title @click="navigateHome" style="color: white">{{
+        <v-list-item value="home" @click="navigateHome">
+          <v-list-item-title style="color: white">{{
             $t("AppScreen.CONTEST")
           }}</v-list-item-title>
         </v-list-item>
-        <v-list-item value="account">
-          <v-list-item-title @click="personalData" style="color: white">{{
+        <v-list-item value="account" @click="personalData">
+          <v-list-item-title style="color: white">{{
             $t("AppScreen.MY_ACCOUNT")
           }}</v-list-item-title>
         </v-list-item>
-        <v-list-item value="history">
-          <v-list-item-title @click="personalHistory" style="color: white">{{
+        <v-list-item value="history" @click="personalHistory">
+          <v-list-item-title style="color: white">{{
             $t("AppScreen.HISTORY")
           }}</v-list-item-title>
         </v-list-item>
@@ -77,8 +77,8 @@
               >Skanuj</v-list-item-title
             >
           </v-list-item> -->
-        <v-list-item value="surveys">
-          <v-list-item-title @click="surveys" style="color: white">{{
+        <v-list-item value="surveys" @click="surveys">
+          <v-list-item-title style="color: white">{{
             $t("AppScreen.SURVEYS")
           }}</v-list-item-title>
         </v-list-item>
@@ -87,13 +87,13 @@
               >Gry</v-list-item-title
             >
           </v-list-item> -->
-        <v-list-item value="results">
-          <v-list-item-title @click="scoreboard" style="color: white">{{
+        <v-list-item value="results" @click="scoreboard">
+          <v-list-item-title style="color: white">{{
             $t("AppScreen.RESULTS")
           }}</v-list-item-title>
         </v-list-item>
-        <v-list-item value="logout">
-          <v-list-item-title @click="logout" style="color: white">{{
+        <v-list-item value="logout" @click="logout">
+          <v-list-item-title style="color: white">{{
             $t("AppScreen.LOG_OUT")
           }}</v-list-item-title>
         </v-list-item>
