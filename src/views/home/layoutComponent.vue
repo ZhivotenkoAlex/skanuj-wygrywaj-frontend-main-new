@@ -62,14 +62,19 @@
             $t("AppScreen.CONTEST")
           }}</v-list-item-title>
         </v-list-item>
-        <v-list-item value="account" @click="personalData">
+        <v-list-item value="account" @click="navigatePersonalData">
           <v-list-item-title style="color: white">{{
             $t("AppScreen.MY_ACCOUNT")
           }}</v-list-item-title>
         </v-list-item>
-        <v-list-item value="history" @click="personalHistory">
+        <v-list-item value="history" @click="navigatePersonalHistory">
           <v-list-item-title style="color: white">{{
             $t("AppScreen.HISTORY")
+          }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item value="coupons" @click="navigateCoupons">
+          <v-list-item-title style="color: white">{{
+            $t("AppScreen.KNOWLEDGE")
           }}</v-list-item-title>
         </v-list-item>
         <!-- <v-list-item>
@@ -77,7 +82,7 @@
               >Skanuj</v-list-item-title
             >
           </v-list-item> -->
-        <v-list-item value="surveys" @click="surveys">
+        <v-list-item value="surveys" @click="navigateSurveys">
           <v-list-item-title style="color: white">{{
             $t("AppScreen.SURVEYS")
           }}</v-list-item-title>
@@ -87,7 +92,7 @@
               >Gry</v-list-item-title
             >
           </v-list-item> -->
-        <v-list-item value="results" @click="scoreboard">
+        <v-list-item value="results" @click="navigateScoreboard">
           <v-list-item-title style="color: white">{{
             $t("AppScreen.RESULTS")
           }}</v-list-item-title>
@@ -158,7 +163,7 @@ export default {
       drawer.value = false
     }
 
-    const surveys = () => {
+    const navigateSurveys = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -188,7 +193,7 @@ export default {
       }
     }
 
-    const scoreboard = () => {
+    const navigateScoreboard = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -205,7 +210,7 @@ export default {
       drawer.value = false
     }
 
-    const personalData = () => {
+    const navigatePersonalData = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -222,7 +227,24 @@ export default {
       drawer.value = false
     }
 
-    const personalHistory = () => {
+    const navigateCoupons = () => {
+      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+
+      if (typeof window.gtag !== "undefined") {
+        window.gtag("event", "NEW_LOYALTY", {
+          event_category: "page_open",
+          value: "coupons",
+        })
+      }
+
+      router.push({
+        name: "coupons",
+        query: { company_name: passedCompanyId },
+      })
+      drawer.value = false
+    }
+
+    const navigatePersonalHistory = () => {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
 
       if (typeof window.gtag !== "undefined") {
@@ -359,16 +381,17 @@ export default {
       selectedItem,
       navigateHome,
       notifications,
-      surveys,
+      navigateSurveys,
       receiptUpload,
-      scoreboard,
-      personalData,
-      personalHistory,
+      navigateScoreboard,
+      navigatePersonalData,
+      navigatePersonalHistory,
       setupLayout,
       getUser,
       logout,
       closeWidget,
       loadTasks,
+      navigateCoupons,
     }
   },
 }

@@ -30,6 +30,7 @@ import gamification from "@/views/home/gamifications/gamificationComponent.vue";
 import purchaseresult from "@/views/home/reward/purchaseResult";
 import applyreservation from "@/views/home/reward/applyReservation";
 import reservationresult from "@/views/home/reward/reservationResult";
+import coupons from "@/views/home/coupons/couponsComponent";
 import { hasRules } from "@/helpers/hasRules";
 
 const routes = [
@@ -171,6 +172,11 @@ const routes = [
                 path: "/gamification",
                 name: "gamification",
                 component: gamification
+            },
+            {
+                path: "/coupons",
+                name: "coupons",
+                component: coupons
             }
         ],
         meta: {
