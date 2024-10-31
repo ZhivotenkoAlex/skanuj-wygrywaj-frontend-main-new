@@ -70,10 +70,10 @@
   </v-card>
 </template>
 <script>
-import { NO_HISTORY, NO_COMPANY_FOUND } from "@/appConstants";
-import companyconfig from "@/core/companyconfig";
-import auth from "@/core/auth";
-import api from "@/services/fetchapi";
+import { NO_HISTORY, NO_COMPANY_FOUND } from "@/appConstants"
+import companyconfig from "@/core/companyconfig"
+import auth from "@/core/auth"
+import api from "@/services/fetchapi"
 export default {
   data() {
     return {
@@ -90,106 +90,104 @@ export default {
         "light-green",
         "light-blue",
         "blue-grey",
-        "brown"
+        "brown",
       ],
-      historyExists: false
-    };
+      historyExists: false,
+    }
   },
   mounted() {
-    this.setupLayout();
-    this.loadHistory();
+    this.setupLayout()
+    this.loadHistory()
   },
   methods: {
     /**
      * Set the Intial color configuration for page
      */
     setupLayout() {
-      let data = companyconfig.getCompanyScheme();
+      let data = companyconfig.getCompanyScheme()
       if (data != "") {
-        this.$set(this.config, "mcolor", data.main_color);
-        this.$set(this.config, "mfontcolor", data.main_font_color);
+        this.$set(this.config, "mcolor", data.main_color)
+        this.$set(this.config, "mfontcolor", data.main_font_color)
       }
     },
     /** Navigate to previous url */
     navigate() {
-      this.$router.go(-1);
+      this.$router.go(-1)
     },
     /** Navigate to home page */
     navigatehome() {
-      let passedCompanyId = companyconfig.getCompanyIdfromUrl();
+      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       this.$router.push({
         name: "home",
-        query: { company_name: passedCompanyId }
-      });
+        query: { company_name: passedCompanyId },
+      })
     },
     /** Load the user entire history */
     loadHistory() {
-      let passedCompanyId = companyconfig.getCompanyIdfromUrl();
-      let token = auth.getAccessToken();
+      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+      let token = auth.getAccessToken()
       //let lang = this.$i18n.locale;
       api
         .getHistory(token, passedCompanyId)
-        .then(result => {
-          let response = result.data;
-          let items = response.data;
-          let data = [];
+        .then((result) => {
+          let response = result.data
+          let items = response.data
+          let data = []
           if (items.length != 0) {
-            items.forEach((item, index) => {
-              let obj = {};
-              console.log(index);
+            items.forEach((item) => {
+              let obj = {}
               if (item.points < 0) {
-                obj.mcolor = "red";
+                obj.mcolor = "red"
               } else {
-                obj.mcolor = "green";
+                obj.mcolor = "green"
               }
-              obj.points = item.points + " " + this.$t("AppScreen.POINTS");
-              obj.type = this.getType(item.type);
-              obj.date = item.date;
-              obj.color = this.colors[
-                Math.floor(Math.random() * this.colors.length)
-              ];
-              data.push(obj);
-            });
-            this.history = data;
-            this.historyExists = true;
+              obj.points = item.points + " " + this.$t("AppScreen.POINTS")
+              obj.type = this.getType(item.type)
+              obj.date = item.date
+              obj.color =
+                this.colors[Math.floor(Math.random() * this.colors.length)]
+              data.push(obj)
+            })
+            this.history = data
+            this.historyExists = true
           } else {
-            this.historyExists = false;
+            this.historyExists = false
           }
         })
-        .catch(err => {
-          this.historyExists = false;
-          let errmsg = err.data.message;
+        .catch((err) => {
+          this.historyExists = false
+          let errmsg = err.data.message
           if (errmsg === NO_HISTORY) {
-            console.log(err);
+            console.log(err)
           } else if (errmsg === NO_COMPANY_FOUND) {
-            console.log(err);
+            console.log(err)
           }
-        });
+        })
     },
     /** Get the type of history information which are displayed */
     getType(type) {
-      let op = "";
+      let op = ""
       switch (type) {
         case "S":
-          op = this.$t("AppScreen.SURVEY_ANSWERED");
-          break;
+          op = this.$t("AppScreen.SURVEY_ANSWERED")
+          break
         case "SV":
-          op = this.$t("AppScreen.SURVEY_VIEWED");
-          break;
+          op = this.$t("AppScreen.SURVEY_VIEWED")
+          break
         case "BAR":
-          op = this.$t("AppScreen.BARCODE_SCANNED");
-          break;
+          op = this.$t("AppScreen.BARCODE_SCANNED")
+          break
         case "RRU":
-          op = this.$t("AppScreen.REGISTRATION_WITH_INVITE_CODE");
-          break;
+          op = this.$t("AppScreen.REGISTRATION_WITH_INVITE_CODE")
+          break
         case "BAP":
-          op = this.$t("AppScreen.BOUGHT_A_PRICE");
-          break;
+          op = this.$t("AppScreen.BOUGHT_A_PRICE")
+          break
       }
-      return op;
-    }
-  }
-};
+      return op
+    },
+  },
+}
 
 //  S = survey answered
 //             SV = survey viewed

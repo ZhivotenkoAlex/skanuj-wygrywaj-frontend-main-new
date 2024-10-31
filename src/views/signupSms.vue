@@ -658,7 +658,6 @@ export default {
             }
           })
           .catch((response) => {
-            console.log("wrong")
             register.errType = "error"
             register.showerror = true
             register.loading = false

@@ -277,7 +277,6 @@ export default {
     }
 
     const getUser = () => {
-      console.log("DEBUG: getUser called in layout")
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       let data = companyconfig.getUserScheme(passedCompanyId)
       if (data != "" && data.user_id) {
@@ -364,7 +363,6 @@ export default {
     }
 
     onMounted(() => {
-      console.log("DEBUG: created called in module layout")
       setupLayout()
       loadTasks()
       getUser()

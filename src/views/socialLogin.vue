@@ -776,7 +776,6 @@ function doPhoneCheck() {
       })
       .catch((response) => {
         register.requestSent = false
-        console.log("wrong")
         register.showerror = true
         let msg = response.data.message
         if (msg === UNABLE_TO_CREATE_ACCOUNT) {

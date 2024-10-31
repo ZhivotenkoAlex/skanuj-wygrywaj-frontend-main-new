@@ -284,9 +284,7 @@ export default {
       )
       const userResponse = await api.getUserData(token, passedCompanyId)
       const userData = userResponse.data.data
-      console.log("🚀 ~ getFormScheme ~ userData:", userData)
       let schemaData = schemaResult?.data?.data?.fields
-      console.log("🚀 ~ getFormScheme ~ schemaData:", schemaData)
       if (schemaData) {
         Object.keys(schemaData).forEach((key) => {
           if (schemaData[key].type === "date") {
