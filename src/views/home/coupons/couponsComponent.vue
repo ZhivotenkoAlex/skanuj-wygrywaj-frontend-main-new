@@ -33,7 +33,7 @@
             @enter="enter"
             @leave="leave"
           >
-            <div v-if="isDescriptionShown">
+            <div v-if="isDescriptionShown" class="coupon_list">
               <div v-for="(coupon, index) in coupons" :key="index">
                 <couponItem :couponItem="coupon" />
               </div>
@@ -204,5 +204,9 @@ export default {
   overflow: hidden;
   opacity: 1;
   margin-top: 35px;
+}
+.coupon_list {
+  display: grid;
+  gap: 10px;
 }
 </style>
