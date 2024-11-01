@@ -995,9 +995,10 @@ function checkSafariBrowser() {
   -webkit-box-pack: center;
   justify-content: center;
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   margin: 0 5px;
+  border-radius: 5px;
   /*border-radius: 50%;*/
   cursor: pointer;
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
@@ -1118,6 +1119,7 @@ function checkSafariBrowser() {
   display: block;
   position: absolute;
   font-size: 7.5pt;
+  border-radius: 5px;
 }
 
 /* .tooltip:after { */
