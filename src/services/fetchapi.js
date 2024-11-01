@@ -656,5 +656,30 @@ export default {
     return axiosinstance.post(GlobalConfig.baseUrl + "mail/send-email", {
       companyId, to, subject, body
     });
-  }
+  },
+
+  /**
+ * Get gamification coupons дшіе
+ * @param token
+ * @param companyname
+ * @returns {*}
+ */
+  getCouponList(token, companyname) {
+    return axiosinstance.post(GlobalConfig.baseUrl + "game/coupons", {
+      access_token: token,
+      company_name: companyname
+    });
+  },
+
+  /**
+* Get gamification coupons
+* @param token
+* @param companyname
+* @returns {*}
+*/
+  getCoupon(token, couponId) {
+    return axiosinstance.post(GlobalConfig.baseUrl + `game/coupons/${couponId}`, {
+      access_token: token,
+    });
+  },
 };

@@ -9,33 +9,31 @@
           <div class="icon_container flex">
             <v-avatar
               variant="elevated"
-              :size="avatarSize"
+              size="70"
               style="background-color: white"
             >
-              <v-icon class="white" :color="config.mfontcolor" :size="iconSize"
+              <v-icon class="white" :color="config.mfontcolor" size="40"
                 >mdi-book-open-variant-outline</v-icon
               >
             </v-avatar>
           </div>
         </v-container>
-        <v-card style="padding: 5px; margin: 10px 0">
-          <v-img
-            src="https://cdn.2take.it/v2/intermag/172500428566d179fd8058b9.28822340.png"
-          ></v-img>
-          <v-card flat link @click="navigateContent" class="description">
+        <v-card v-if="coupon" style="padding: 5px; margin: 35px 0">
+          <v-img :src="coupon.image"></v-img>
+          <v-card flat class="description">
             <h3 class="coupon_title">
-              Rola gleby w produkcji rolnej - poradnik
+              {{ coupon.title }}
             </h3>
             <v-btn
               style="margin: 20px 0"
-              href="https://intermag.pl/wp-content/uploads/2024/Newsletter/Rola_gleby_w_produkcji_rolnej_poradnik.pdf"
+              :href="coupon.content_link"
               target="_blank"
               block
               variant="text"
               :color="config.pcolor"
               class="button_link"
             >
-              Pobierz Poradnik!
+              {{ $t("AppScreen.GET_GUIDE") }}
             </v-btn>
           </v-card>
           <v-card-actions class="back_button">
@@ -54,36 +52,22 @@
 </template>
 
 <script>
-import { GamificationType } from "@/appConstants"
-// import api from "@/services/fetchapi"
-// import auth from "@/core/auth"
+import api from "@/services/fetchapi"
+import auth from "@/core/auth"
 import companyconfig from "@/core/companyconfig"
 // import { useI18n } from "vue-i18n"
-import { useRouter } from "vue-router"
-import { ref, computed, onMounted } from "vue"
+import { useRouter, useRoute } from "vue-router"
+import { ref, onMounted } from "vue"
 
 export default {
   components: {},
   props: {},
   setup() {
     const router = useRouter()
-
+    const route = useRoute()
     // const { t } = useI18n()
-    const isDescriptionShown = ref(false)
-    const tab = ref("1")
-    const surveyName = ref("")
-    const results = ref([])
-    const type = ref("LIST")
     const config = ref({})
-    const inviteCode = ref("")
-
-    const avatarSize = computed(() => {
-      return !isDescriptionShown.value ? 70 : 50
-    })
-
-    const iconSize = computed(() => {
-      return !isDescriptionShown.value ? 40 : 30
-    })
+    const coupon = ref(null)
 
     const setupLayout = () => {
       let data = companyconfig.getCompanyScheme()
@@ -97,34 +81,37 @@ export default {
 
     onMounted(() => {
       setupLayout()
+      loadCoupon()
     })
-
-    const navigateContent = () => {
-      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
-      router.push({
-        name: "couponContent",
-        params: { id: 1 },
-        query: { company_name: passedCompanyId },
-      })
-    }
 
     const goBack = () => {
       router.go(-1)
     }
 
+    const loadCoupon = () => {
+      const id = route.params.id
+      let token = auth.getAccessToken()
+      api
+        .getCoupon(token, id)
+        .then((result) => {
+          let response = result.data
+          let couponData = response.data
+          coupon.value = couponData
+        })
+
+        .catch((err) => {
+          let errormsg = err.data.message
+          if (errormsg === "NO_SURVEY_FOUND") {
+            console.error(errormsg)
+          }
+          coupon.value = null
+        })
+    }
+
     return {
-      GamificationType,
-      isDescriptionShown,
-      tab,
-      surveyName,
-      results,
-      type,
       config,
-      inviteCode,
-      avatarSize,
-      iconSize,
+      coupon,
       setupLayout,
-      navigateContent,
       goBack,
     }
   },
@@ -186,16 +173,6 @@ export default {
   font-size: 18px;
   font-weight: 700;
 }
-/* .fade-enter-active,
-.fade-leave-active {
-  transition: all 0.5s ease;
-} */
-/* .fade-enter, */
-/* .fade-leave-to {
-  opacity: 0;
-  margin: 0 !important;
-  padding: 0 !important;
-} */
 .container-content {
   overflow: hidden;
   opacity: 1;

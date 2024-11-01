@@ -1,18 +1,11 @@
 <template>
   <v-card style="padding: 5px">
     <div class="content">
-      <v-img
-        height="170"
-        src="https://cdn.2take.it/v2/intermag/172500428566d179fd8058b9.28822340.png"
-      ></v-img>
+      <v-img height="170" :src="coupon.image"></v-img>
       <v-card flat link @click="navigateContent" class="description">
-        <p class="coupon_title">Rola gleby w produkcji rolnej - poradnik</p>
+        <p class="coupon_title">{{ coupon.title }}</p>
         <p class="coupon_subtitle">
-          W Poradniku definiujemy podstawowe parametry odpowiadające za na
-          żyzność i zdrowotność gleby oraz wskazujemy działania mające na celu
-          poprawę jej właściwości, produktywności i zapobiegające jej
-          degradacji. Zwracamy też uwagę na niezwykle ważną rolę, jaką pełnią w
-          tych działaniach mikroorganizmy glebowe.
+          {{ coupon.description }}
         </p>
       </v-card>
     </div>
@@ -30,8 +23,13 @@ import { ref, computed, onMounted } from "vue"
 
 export default {
   components: {},
-  props: {},
-  setup() {
+  props: {
+    couponItem: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props) {
     const router = useRouter()
 
     // const { t } = useI18n()
@@ -69,7 +67,7 @@ export default {
       let passedCompanyId = companyconfig.getCompanyIdfromUrl()
       router.push({
         name: "couponContent",
-        params: { id: 1 },
+        params: { id: props.couponItem.id },
         query: { company_name: passedCompanyId },
       })
     }
@@ -87,6 +85,7 @@ export default {
       iconSize,
       setupLayout,
       navigateContent,
+      coupon: props.couponItem,
     }
   },
 }

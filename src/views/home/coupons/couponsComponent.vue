@@ -33,8 +33,10 @@
             @enter="enter"
             @leave="leave"
           >
-            <div>
-              <couponItem v-if="isDescriptionShown" />
+            <div v-if="isDescriptionShown">
+              <div v-for="(coupon, index) in coupons" :key="index">
+                <couponItem :couponItem="coupon" />
+              </div>
             </div>
           </transition>
         </v-container>
@@ -90,6 +92,7 @@ export default {
     const showGames = ref(false)
     const config = reactive({})
     const isDescriptionShown = ref(true)
+    const coupons = ref([])
 
     const avatarSize = computed(() => {
       return isDescriptionShown.value ? 70 : 50
@@ -154,7 +157,28 @@ export default {
       }, 300)
     }
 
+    const loadCoupons = () => {
+      let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+      let token = auth.getAccessToken()
+      api
+        .getCouponList(token, passedCompanyId)
+        .then((result) => {
+          let response = result.data
+          let couponsList = response.data
+          coupons.value = couponsList
+        })
+
+        .catch((err) => {
+          let errormsg = err.data.message
+          if (errormsg === "NO_SURVEY_FOUND") {
+            console.error(errormsg)
+          }
+          coupons.value = []
+        })
+    }
+
     onMounted(() => {
+      loadCoupons()
       loadGamifications()
       setupLayout()
     })
@@ -166,6 +190,7 @@ export default {
       isDescriptionShown,
       avatarSize,
       iconSize,
+      coupons,
       toggleDescription,
       beforeEnter,
       enter,
