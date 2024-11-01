@@ -31,6 +31,7 @@ import { loadedLanguages } from "@/plugins/i18n"
 import api from "@/services/loginapi"
 import fetchapi from "./services/fetchapi"
 import { loadLanguageAsync } from "@/plugins/i18n"
+// import { COMPANY_CONFIG_KEY } from "@/appConstants"
 
 export default {
   name: "App",
@@ -187,8 +188,14 @@ export default {
         }
       }
     }
+    // const handleBeforeUnload = () => {
+    //   let passedCompanyId = companyconfig.getCompanyIdfromUrl()
+    //   const label = COMPANY_CONFIG_KEY + "_" + passedCompanyId
+    //   localStorage.removeItem(label)
+    // }
 
     onMounted(() => {
+      // window.addEventListener("beforeunload", handleBeforeUnload)
       document.domain = get_top_domain()
       fetchCompany()
       loadMessagesOnScreenRefresh()
@@ -198,6 +205,7 @@ export default {
     })
 
     onBeforeUnmount(() => {
+      // window.removeEventListener("beforeunload", handleBeforeUnload)
       cancelAutoUpdate()
     })
 
