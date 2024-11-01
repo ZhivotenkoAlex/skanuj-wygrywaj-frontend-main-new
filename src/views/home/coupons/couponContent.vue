@@ -1,7 +1,11 @@
 <template>
   <v-container>
-    <v-card class="mx-auto mb-3" style="width: 100%">
-      <div class="root">
+    <v-card
+      flat
+      class="mx-auto mb-3"
+      :style="`width: 100%; background-color: ${isTransparent}`"
+    >
+      <div v-if="coupon" class="root">
         <v-container
           :style="`background-color:${config.pcolor};`"
           class="top_container"
@@ -18,7 +22,7 @@
             </v-avatar>
           </div>
         </v-container>
-        <v-card v-if="coupon" style="padding: 5px; margin: 35px 0">
+        <v-card flat style="padding: 5px; margin: 35px 0">
           <v-img :src="coupon.image"></v-img>
           <v-card flat class="description">
             <h3 class="coupon_title">
@@ -47,6 +51,7 @@
           </v-card-actions>
         </v-card>
       </div>
+      <loaderComponent v-else></loaderComponent>
     </v-card>
   </v-container>
 </template>
@@ -57,10 +62,11 @@ import auth from "@/core/auth"
 import companyconfig from "@/core/companyconfig"
 // import { useI18n } from "vue-i18n"
 import { useRouter, useRoute } from "vue-router"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
+import loaderComponent from "@/components/shared/loaderComponent.vue"
 
 export default {
-  components: {},
+  components: { loaderComponent },
   props: {},
   setup() {
     const router = useRouter()
@@ -78,6 +84,10 @@ export default {
         config.value.pcolor = data.primary_color
       }
     }
+
+    const isTransparent = computed(() => {
+      return coupon.value ? "white" : "transparent"
+    })
 
     onMounted(() => {
       setupLayout()
@@ -97,6 +107,7 @@ export default {
           let response = result.data
           let couponData = response.data
           coupon.value = couponData
+          console.log("🚀 ~ isFlat ~ coupon.value:3", !!coupon.value)
         })
 
         .catch((err) => {
@@ -113,6 +124,7 @@ export default {
       coupon,
       setupLayout,
       goBack,
+      isTransparent,
     }
   },
 }
